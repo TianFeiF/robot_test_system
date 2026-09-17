@@ -46,3 +46,20 @@ A/B ONLINE、Heartbeat 和 Diagnostics；按住 JOG 位置增长、松手停车�
 - 包含布局检查的完整回归 37 项通过；7 个安全/相机单元测试通过。完整运行输出仍在 `logs/multicamera_8_results.txt`，日志目录 `logs/fullscreen_acceptance/`。
 - 测试机器物理桌面为 2560×1600、Qt DPR=1；未修改系统显示设置。1920×1080 验证使用精确窗口画布，桌面全屏和 F11/Esc 另行验证。
 - 新增 `docs/使用指南.md`、`docs/后续配置指南.md`。主目录原开发提示词用 Markdown 删除线标记已完成项，原文备份在 `docs/reference/原开发提示词_完成标记前.md`；去除新增说明和删除线后与备份逐字一致。
+
+## 笔记本 UVC 摄像头（2026-09-17）
+
+- 实际识别设备：USB2.0 FHD UVC WebCam，彩色入口 `/dev/video0`。
+- UVCCameraAdapter 实际读取 8 帧 640×480×3 图像，状态 OK，约 5 FPS，失败计数 0；测试只输出尺寸/计数，不保存照片或录像。
+- 一路 UVC + 七路 Mock 的 ROS/Qt 验收 16 项通过，含真实取图、ROS 预览、JOG、松手停车、Watchdog、STOP ALL、A 退出/重启、Mock 单路故障隔离。结果：`logs/uvc_results.txt`，CSV：`logs/laptop_uvc_acceptance/`。测试未保存含真实画面的截图，结束后释放摄像头。
+- 10 个单元测试通过，新增 UVC 读失败重连、无设备失败隔离、取图阻塞时诊断/断开不阻塞。
+- 入口：`scripts/start_laptop_camera_demo.sh`，仅使用临时配置，不更改默认 Mock YAML。说明见 `docs/笔记本摄像头测试.md`。
+- 尚未做外接 USB 摄像头实际拔插及 20～30 分钟长期稳定性试验；这两项不能用短时读取成功替代。
+
+## A/B LiDAR Mock 状态补齐（2026-09-17）
+
+- 新增独立 MockLidarAdapter，A/B hardware.lidar 各一台；暂不猜测型号对应关系，model 为待确认。
+- 按模拟时间累积扫描、点、包计数，支持掉线/恢复、错误/丢包/重连计数；仅发布 Diagnostics 与 CSV，不发布点云。
+- 相关 3 个包实际 build 成功，11 个单元测试通过。43 项运行验收通过，含两台雷达计数增长、故障变红与计数停止、恢复/重连，以及原 P0/P1 和 1920×1080 无裁切检查。
+- 结果：`logs/lidar_results.txt`；截图：`logs/lidar_1920x1080.png`；CSV：`logs/lidar_acceptance/`。
+- 真实雷达驱动/点云尚未接入；模拟 packet/drop 数不能用来反推网桥实际吞吐。带宽估算及官方来源见 `docs/无线网桥与雷达预算.md`。

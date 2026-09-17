@@ -1,8 +1,10 @@
 # Robot Hardware Test System v0.1
 
-ROS 2 Humble 双机器人硬件测试 **Mock Demo**。一台 Ubuntu 22.04 笔记本运行 Robot A、Robot B 和 PySide6 地面站。当前没有任何真实硬件驱动，不是生产控制系统。
+ROS 2 Humble 双机器人硬件测试 **Mock Demo**。一台 Ubuntu 22.04 笔记本运行 Robot A、Robot B 和 PySide6 地面站。默认全 Mock；另提供笔记本 UVC 摄像头接入，机器人真实驱动仍未实现。不是生产控制系统。
 
 详细文档：[使用指南](docs/使用指南.md) · [后续配置指南](docs/后续配置指南.md)。
+
+只有笔记本也能测试：[笔记本摄像头测试](docs/笔记本摄像头测试.md)，运行 `./scripts/start_laptop_camera_demo.sh`。
 
 ## 快速启动（当前机器）
 
@@ -162,3 +164,5 @@ ROS_DOMAIN_ID=86 ROS_LOCALHOST_ONLY=1 QT_QPA_PLATFORM=offscreen \
 ```
 
 最新多相机结果和截图为 `logs/multicamera_8_results.txt`、`logs/multicamera_8_ground.png` 以及 `multicamera_7_*`。
+
+新增：A/B 各一行 LiDAR Mock 状态，支持故障注入与计数。参考 [无线网桥与雷达预算](docs/无线网桥与雷达预算.md)。

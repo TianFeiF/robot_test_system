@@ -23,7 +23,8 @@ class GroundWindow(QMainWindow):
         self.active_jog = None
         self.auto_robots = set()
         self.token = 0
-        self.setWindowTitle('Robot Hardware Test System v0.1 — MOCK')
+        hardware_label = 'UVC CAMERA + MOCK MOTORS' if any(c.get('backend') == 'uvc' for cfg in configs.values() for c in cfg.get('cameras', {}).values()) else 'MOCK HARDWARE TEST'
+        self.setWindowTitle('Robot Hardware Test System v0.1 — ' + hardware_label)
         self.resize(1920, 1080)
         self.setFont(QFont('DejaVu Sans', 10))
         QShortcut(QKeySequence('F11'), self, activated=self.toggle_fullscreen)
@@ -34,7 +35,7 @@ class GroundWindow(QMainWindow):
         layout.setContentsMargins(8, 6, 8, 6)
         layout.setSpacing(4)
         title_row = QHBoxLayout()
-        title_row.addWidget(QLabel('MOCK HARDWARE TEST | Software STOP ≠ hardware emergency stop | F11: full screen / Esc: window'))
+        title_row.addWidget(QLabel(hardware_label + ' | Software STOP ≠ hardware emergency stop | F11: full screen / Esc: window'))
         close_button = QPushButton('EXIT / STOP ALL')
         close_button.clicked.connect(self.close)
         title_row.addWidget(close_button)
@@ -206,7 +207,7 @@ class GroundWindow(QMainWindow):
         event.ignore()
 
 def load_configs():
-    base = Path(get_package_share_directory('robot_test_bringup')) / 'config'
+    base = Path(os.environ['ROBOT_TEST_CONFIG_DIR']) if os.environ.get('ROBOT_TEST_CONFIG_DIR') else Path(get_package_share_directory('robot_test_bringup')) / 'config'
     return {p.stem: yaml.safe_load(p.read_text()) for p in sorted(base.glob('robot_*.yaml'))}
 
 def main(args=None):

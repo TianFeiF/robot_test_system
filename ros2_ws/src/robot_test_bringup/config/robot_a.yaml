@@ -31,6 +31,13 @@ hardware:
   rs485:
     enabled: true
     backend: mock
+  lidar:
+    enabled: true
+    backend: mock
+    model: Livox (model pending)
+    mock_scan_hz: 10.0
+    mock_points_per_scan: 20000
+    mock_packets_per_scan: 200
 test:
   watchdog_timeout_ms: 500
   heartbeat_hz: 1.0

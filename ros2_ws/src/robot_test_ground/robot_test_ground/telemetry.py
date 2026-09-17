@@ -19,6 +19,8 @@ def telemetry_cells(name: str, device: dict, online: bool) -> list:
     velocity = number(values['velocity']) if 'velocity' in values else '—'
     if 'position' in values:
         keys = [('enabled', 'enabled'), ('error_count', 'err'), ('reconnect_count', 'reconnect')]
+    elif 'points_per_second' in values:
+        keys = [('scan_hz', 'Hz'), ('points_per_second', 'pts/s'), ('packet_count', 'packets'), ('drop_count', 'drop'), ('error_count', 'err'), ('reconnect_count', 'reconnect')]
     elif 'frame_count' in values:
         keys = [('fps', 'FPS'), ('frame_count', 'frames'), ('drop_count', 'drop'), ('disconnect_count', 'disconnect'), ('reconnect_count', 'reconnect')]
     elif name == 'System':

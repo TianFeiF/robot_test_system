@@ -15,8 +15,14 @@ def create_motor_adapter(config: dict) -> MotorAdapter:
 
 def create_device_adapter(kind: str, config: dict) -> DeviceAdapter:
     backend = config.get('backend', 'mock')
+    if kind == 'camera' and backend == 'uvc':
+        from .real_adapters.uvc_camera import UVCCameraAdapter
+        return UVCCameraAdapter(config)
     if backend not in DEVICE_BACKENDS:
         raise NotImplementedError(f'{kind} backend {backend!r} is not implemented')
+    if kind == 'lidar' and backend == 'mock':
+        from .lidar import MockLidarAdapter
+        return MockLidarAdapter(config)
     if kind == 'camera' and backend == 'mock':
         from .camera import MockCameraAdapter
         return MockCameraAdapter(config)

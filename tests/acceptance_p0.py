@@ -20,6 +20,9 @@ config_directory = ROOT / 'ros2_ws/src/robot_test_bringup/config'
 temporary_config = None
 if os.environ.get('TEST_CAMERA_COUNT') == '4':
     configs['robot_a']['cameras']['camera_5']['enabled'] = False
+if os.environ.get('TEST_UVC') == '1':
+    configs['robot_a']['cameras']['camera_1'].update(backend='uvc', device='/dev/video0', width=640, height=480, fps=5)
+if os.environ.get('TEST_CAMERA_COUNT') == '4' or os.environ.get('TEST_UVC') == '1':
     temporary_config = tempfile.TemporaryDirectory(prefix='robot-camera-acceptance-')
     config_directory = Path(temporary_config.name)
     for rid, config in configs.items():
@@ -89,12 +92,29 @@ try:
                     if item:
                         assert all(table.fontMetrics().horizontalAdvance(line) <= table.columnWidth(col) - 8 for line in item.text().splitlines()), (rid, row, col, item.text())
         check('1920x1080: every device row, camera and control visible without elision', True)
-        window.grab().save(str(ROOT / 'logs' / 'dashboard_1920x1080.png'))
+        if os.environ.get('TEST_UVC') != '1':
+            window.grab().save(str(ROOT / 'logs' / 'dashboard_1920x1080.png'))
 
     for rid, cfg in configs.items():
         expected = set(camera_configs(cfg))
         actual = {name for name in bridge.snapshot(rid).devices if name.startswith('camera_')}
         check(f'{rid}: configured camera diagnostics match', expected == actual)
+    for rid in configs:
+        until(lambda: bridge.snapshot(rid).devices.get('lidar', {}).get('level') == 0)
+        initial = int(bridge.snapshot(rid).devices['lidar']['values']['point_count'])
+        pump(0.4)
+        check(f'{rid}: LiDAR mock point counters advance', int(bridge.snapshot(rid).devices['lidar']['values']['point_count']) > initial)
+        window.robot.setCurrentText(rid)
+        window.test_panel.device.setCurrentText('lidar')
+        window.test_panel.inject(True)
+        until(lambda: bridge.snapshot(rid).devices['lidar']['level'] == 3)
+        before = int(bridge.snapshot(rid).devices['lidar']['values']['point_count'])
+        pump(0.4)
+        check(f'{rid}: LiDAR fault red, counts stop, heartbeat stays online', int(bridge.snapshot(rid).devices['lidar']['values']['point_count']) == before and bridge.snapshot(rid).online)
+        window.test_panel.inject(False)
+        until(lambda: bridge.snapshot(rid).devices['lidar']['level'] == 0 and int(bridge.snapshot(rid).devices['lidar']['values']['reconnect_count']) > 0)
+        check(f'{rid}: LiDAR recovery and reconnect counter', True)
+    window.robot.setCurrentText('robot_a')
     victim = ('robot_a', next(reversed(camera_configs(configs['robot_a']))))
     other_keys = [key for key in camera_keys if key != victim]
     before_frames = {key: bridge.frame(*key)[0] for key in other_keys}
@@ -203,8 +223,13 @@ try:
                 rows.append(marks[-1])
         check('Event marker logged by all three with identical time/id', len({(r['timestamp'],r['value']) for r in rows}) == 1)
         check('All status CSV files contain records', all((logdir / f'{name}_status.csv').stat().st_size > 200 for name in ['ground','robot_a','robot_b']))
-    window.grab().save(str(ROOT / 'logs' / f'multicamera_{len(camera_keys)}_ground.png'))
-    (ROOT / 'logs' / f'multicamera_{len(camera_keys)}_results.txt').write_text('\n'.join(results) + '\n')
+    if os.environ.get('TEST_UVC') != '1':
+        window.grab().save(str(ROOT / 'logs' / f'multicamera_{len(camera_keys)}_ground.png'))
+    else:
+        camera = bridge.snapshot('robot_a').devices['camera_1']['values']
+        check('Real UVC camera through Agent, ROS and Qt preview', camera['backend'] == 'uvc' and int(camera['width']) == 640)
+        check('Other seven cameras stay mock', all(cfg['backend'] == 'mock' for rid, config in configs.items() for name, cfg in config['cameras'].items() if (rid, name) != ('robot_a', 'camera_1')))
+    (ROOT / 'logs' / ('uvc_results.txt' if os.environ.get('TEST_UVC') == '1' else f'multicamera_{len(camera_keys)}_results.txt')).write_text('\n'.join(results) + '\n')
 finally:
     window.stop_all()
     pump(0.3)
