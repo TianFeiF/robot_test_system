@@ -1,0 +1,6 @@
+string device
+string fault
+bool active
+---
+bool success
+string message

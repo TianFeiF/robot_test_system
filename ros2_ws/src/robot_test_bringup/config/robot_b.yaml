@@ -1,0 +1,65 @@
+robot:
+  id: robot_b
+  display_name: Robot B
+axes:
+  drive:
+    max_velocity: 0.2
+    jog_velocity: 0.1
+    bus: ethercat
+  clamp_left:
+    max_velocity: 0.2
+    jog_velocity: 0.1
+    bus: ethercat
+  clamp_right:
+    max_velocity: 0.2
+    jog_velocity: 0.1
+    bus: ethercat
+  z_axis:
+    max_velocity: 0.2
+    jog_velocity: 0.1
+    bus: ethercat
+  support_left:
+    max_velocity: 0.2
+    jog_velocity: 0.1
+    bus: canopen
+  support_right:
+    max_velocity: 0.2
+    jog_velocity: 0.1
+    bus: canopen
+hardware:
+  ethercat:
+    enabled: true
+    backend: mock
+  network:
+    enabled: true
+    backend: mock
+  canopen:
+    enabled: true
+    backend: mock
+test:
+  watchdog_timeout_ms: 500
+  heartbeat_hz: 1.0
+  diagnostics_hz: 5.0
+  auto_cycle:
+    enabled: true
+    axis: drive
+    positive_target: 1.0
+    negative_target: -1.0
+    velocity: 0.1
+    dwell_sec: 1.0
+cameras:
+  camera_1:
+    enabled: true
+    backend: mock
+    fps: 5
+    label: ROBOT B CAMERA 1
+  camera_2:
+    enabled: true
+    backend: mock
+    fps: 5
+    label: ROBOT B CAMERA 2
+  camera_3:
+    enabled: true
+    backend: mock
+    fps: 5
+    label: ROBOT B CAMERA 3
