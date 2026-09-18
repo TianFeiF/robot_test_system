@@ -58,8 +58,11 @@ class CameraPanel(QWidget):
             label = self.status_labels[key]
             state = 'OFFLINE' if not model.online else device.get('message', 'UNKNOWN')
             if healthy and not fresh:
-                state = 'NO RECENT FRAME'
-            label.setText(f'{state} | FPS {values.get("fps", "—")}\nFrames {values.get("frame_count", "—")}')
+                state = '采集正常 / 图像接收中断'
+            stats = self.bridge.camera_stats(rid, camera_id)
+            label.setText(f'{state} | 采集 {values.get("fps", "—")} / 接收 {stats["receive_fps"]} FPS\n'
+                          f'收帧 {stats["received_frames"]} / 解码错误 {stats["decode_errors"]}')
+            label.setToolTip(f'最长收帧间隔 {stats["max_gap_sec"]} 秒；超过 2 秒间隔 {stats["gaps_over_2s"]} 次')
             label.setStyleSheet('color:' + ('green' if healthy and fresh else 'red' if device or not model.online else 'gray'))
             if healthy and fresh:
                 if self.frame_times.get(key) != frame[0]:
@@ -69,5 +72,5 @@ class CameraPanel(QWidget):
                     self.frame_times[key] = received
             else:
                 preview.clear()
-                preview.setText(f'{camera_id}: OFFLINE / NO RECENT FRAME')
+                preview.setText(f'{camera_id}: {state}')
                 self.frame_times.pop(key, None)

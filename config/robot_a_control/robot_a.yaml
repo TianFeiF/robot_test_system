@@ -50,7 +50,7 @@ hardware:
     executable: /home/phi/robot_test_system/.local-deps/bin/eyou_agent
     interface: enp2s0
     z_zero_counts: null
-    allow_unreferenced_z: true
+    allow_unreferenced_z: false
     read_only: false
     log_file: /home/phi/robot_test_system/logs/eyou_sdk.log
     stop_policy: zero_and_disable

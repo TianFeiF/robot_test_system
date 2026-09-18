@@ -111,7 +111,7 @@ class RM75Monitor(PollingDevice):
         records = [line for line in output.splitlines() if line.startswith('{')]
         values = json.loads(records[-1])
         errors = values['arm_errors']
-        return DeviceStatus(DeviceState.ERROR if errors else DeviceState.OK,
+        return DeviceStatus(DeviceState.ERROR if any(errors) else DeviceState.OK,
                             'RM75 read-only joint/arm state; no motion control', values)
 
 

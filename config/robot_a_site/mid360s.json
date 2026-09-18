@@ -1,5 +1,5 @@
 {
-  "Mid360s": {
+  "MID360": {
     "lidar_net_info": {
       "cmd_data_port": 56100,
       "push_msg_port": 56200,

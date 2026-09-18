@@ -80,6 +80,8 @@ class TelemetryTests(unittest.TestCase):
         rm = RM75Monitor({'backend': 'rm75_monitor', 'executable': 'query', 'host': 'localhost'})
         rm.command = lambda args: 'SDK info\n{"joint_degrees":[1,2,3,4,5,6,7],"arm_errors":[4116]}\n'
         self.assertEqual(rm.poll().state, DeviceState.ERROR)
+        rm.command = lambda args: '{"joint_degrees":[1,2,3,4,5,6,7],"arm_errors":[0]}\n'
+        self.assertEqual(rm.poll().state, DeviceState.OK)
 
     def test_mapped_axes_share_bus_and_reject_motion(self):
         config = {'robot': {'monitor_only': True},

@@ -1,4 +1,5 @@
 from robot_test_core.config import camera_configs
+from .frame_stats import FrameStats
 import copy
 import json
 import uuid
@@ -53,6 +54,8 @@ class GroundBridge(Node):
         self.auto_publishers = {}
         self.lock = threading.Lock()
         self.frames = {}
+        self.frame_stats = {}
+        self.frame_states = {}
         self.models = {rid: RobotViewModel(rid) for rid in robot_ids}
         self.commands = queue.Queue()
         self.stop_commands = queue.Queue()
@@ -64,6 +67,7 @@ class GroundBridge(Node):
         self.pending = []
         for rid in robot_ids:
             for camera_id in camera_configs(configs[rid]):
+                self.frame_stats[(rid, camera_id)] = FrameStats()
                 if configs[rid]['cameras'][camera_id].get('transport', 'raw') == 'compressed':
                     self.create_subscription(CompressedImage, f'/{rid}/cameras/{camera_id}/image_raw/compressed',
                                              lambda m, r=rid, c=camera_id: self.on_compressed_frame(r, c, m), qos_profile_sensor_data)
@@ -91,18 +95,30 @@ class GroundBridge(Node):
             import numpy as np
             frame = cv2.imdecode(np.frombuffer(bytes(msg.data), dtype=np.uint8), cv2.IMREAD_COLOR)
             if frame is None:
-                return
+                raise ValueError('Invalid JPEG image')
             height, width = frame.shape[:2]
             with self.lock:
-                self.frames[(rid, camera_id)] = (time.monotonic(), width, height, width * 3, frame.tobytes())
+                now = time.monotonic()
+                self.frames[(rid, camera_id)] = (now, width, height, width * 3, frame.tobytes())
+                self.frame_stats[(rid, camera_id)].record(now)
         except Exception as exc:
+            with self.lock:
+                self.frame_stats[(rid, camera_id)].decode_errors += 1
             self.get_logger().warning(f'Camera {rid}/{camera_id} decode failed: {exc}')
 
     def on_frame(self, rid, camera_id, msg):
         if msg.encoding != 'bgr8' or msg.height <= 0 or msg.width <= 0 or len(msg.data) < msg.step * msg.height:
+            with self.lock:
+                self.frame_stats[(rid, camera_id)].decode_errors += 1
             return
         with self.lock:
-            self.frames[(rid, camera_id)] = (time.monotonic(), msg.width, msg.height, msg.step, bytes(msg.data))
+            now = time.monotonic()
+            self.frames[(rid, camera_id)] = (now, msg.width, msg.height, msg.step, bytes(msg.data))
+            self.frame_stats[(rid, camera_id)].record(now)
+
+    def camera_stats(self, rid, camera_id):
+        with self.lock:
+            return self.frame_stats[(rid, camera_id)].snapshot(time.monotonic())
 
     def frame(self, rid, camera_id):
         with self.lock:
@@ -145,6 +161,16 @@ class GroundBridge(Node):
         for rid in self.models:
             model = self.snapshot(rid)
             self.csv.write('status', device=rid, event='STATUS', level='OK' if model.online else 'OFFLINE', value=json.dumps(model.devices), detail=model.robot_state)
+        for rid, camera_id in self.frame_stats:
+            stats = self.camera_stats(rid, camera_id)
+            key = (rid, camera_id)
+            state = 'OK' if stats['fresh'] else 'STALE'
+            self.csv.write('status', device=f'{rid}/{camera_id}', event='IMAGE_RX',
+                           level=state, value=json.dumps(stats))
+            if self.frame_states.get(key) != state:
+                self.frame_states[key] = state
+                self.csv.write('events', device=f'{rid}/{camera_id}',
+                               event='IMAGE_RX_' + state, value=json.dumps(stats))
 
     def submit(self, rid: str, action: str, token: int = 0, **data):
         with self.command_lock:
