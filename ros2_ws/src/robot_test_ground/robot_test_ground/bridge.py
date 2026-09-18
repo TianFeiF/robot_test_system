@@ -16,11 +16,11 @@ from rclpy.node import Node
 from rclpy.executors import SingleThreadedExecutor
 from rclpy.qos import QoSProfile, ReliabilityPolicy
 from PySide6.QtCore import QObject, Signal
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from rclpy.qos import qos_profile_sensor_data
 from diagnostic_msgs.msg import DiagnosticArray
 from std_srvs.srv import Trigger, SetBool
-from robot_test_msgs.msg import RobotHeartbeat, JogCommand
+from robot_test_msgs.msg import RobotHeartbeat, JogCommand, TorqueCommand
 
 @dataclass
 class RobotViewModel:
@@ -59,15 +59,21 @@ class GroundBridge(Node):
         self.command_lock = threading.Lock()
         self.generations = {rid: 0 for rid in robot_ids}
         self.jog_publishers = {}
+        self.torque_publishers = {}
         self.service_clients = {}
         self.pending = []
         for rid in robot_ids:
             for camera_id in camera_configs(configs[rid]):
-                self.create_subscription(Image, f'/{rid}/cameras/{camera_id}/image_raw',
-                                         lambda m, r=rid, c=camera_id: self.on_frame(r, c, m), qos_profile_sensor_data)
+                if configs[rid]['cameras'][camera_id].get('transport', 'raw') == 'compressed':
+                    self.create_subscription(CompressedImage, f'/{rid}/cameras/{camera_id}/image_raw/compressed',
+                                             lambda m, r=rid, c=camera_id: self.on_compressed_frame(r, c, m), qos_profile_sensor_data)
+                else:
+                    self.create_subscription(Image, f'/{rid}/cameras/{camera_id}/image_raw',
+                                             lambda m, r=rid, c=camera_id: self.on_frame(r, c, m), qos_profile_sensor_data)
             self.create_subscription(RobotHeartbeat, f'/{rid}/heartbeat', lambda m, r=rid: self.on_heartbeat(r, m), 10)
             self.create_subscription(DiagnosticArray, f'/{rid}/diagnostics', lambda m, r=rid: self.on_diagnostics(r, m), 10)
             self.jog_publishers[rid] = self.create_publisher(JogCommand, f'/{rid}/jog_command', QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT))
+            self.torque_publishers[rid] = self.create_publisher(TorqueCommand, f'/{rid}/torque_command', QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT))
             self.event_publishers[rid] = self.create_publisher(TestEvent, f'/{rid}/test_event', 50)
             self.auto_publishers[rid] = self.create_publisher(Time, f'/{rid}/auto_keepalive', QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT))
             self.service_clients[rid] = {'stop': self.create_client(Trigger, f'/{rid}/stop'), 'arm': self.create_client(SetBool, f'/{rid}/arm')}
@@ -78,6 +84,19 @@ class GroundBridge(Node):
         self.create_timer(0.01, self.drain)
         self.create_timer(0.1, self.check_online)
         self.create_timer(1.0, self.log_status)
+
+    def on_compressed_frame(self, rid, camera_id, msg):
+        try:
+            import cv2
+            import numpy as np
+            frame = cv2.imdecode(np.frombuffer(bytes(msg.data), dtype=np.uint8), cv2.IMREAD_COLOR)
+            if frame is None:
+                return
+            height, width = frame.shape[:2]
+            with self.lock:
+                self.frames[(rid, camera_id)] = (time.monotonic(), width, height, width * 3, frame.tobytes())
+        except Exception as exc:
+            self.get_logger().warning(f'Camera {rid}/{camera_id} decode failed: {exc}')
 
     def on_frame(self, rid, camera_id, msg):
         if msg.encoding != 'bgr8' or msg.height <= 0 or msg.width <= 0 or len(msg.data) < msg.step * msg.height:
@@ -144,7 +163,7 @@ class GroundBridge(Node):
             submitted = data.pop('_submitted_ns')
             with self.command_lock:
                 canceled = generation != self.generations[rid]
-            if action in ('jog', 'auto_keepalive', 'arm', 'start_auto'):
+            if action in ('jog', 'torque', 'auto_keepalive', 'arm', 'start_auto'):
                 if canceled or (time.time_ns() - submitted) > 300_000_000:
                     continue
             if action == 'event':
@@ -163,6 +182,11 @@ class GroundBridge(Node):
                 msg.axis = data['axis']
                 msg.velocity = data['velocity']
                 self.jog_publishers[rid].publish(msg)
+                continue
+            if action == 'torque':
+                msg = TorqueCommand(stamp=Time(sec=submitted // 10**9, nanosec=submitted % 10**9),
+                                    axis=data['axis'], torque=data['torque'])
+                self.torque_publishers[rid].publish(msg)
                 continue
             client = self.service_clients[rid][action]
             if not client.service_is_ready():

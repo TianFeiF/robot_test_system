@@ -1,6 +1,8 @@
 # Robot Hardware Test System v0.1
 
-ROS 2 Humble 双机器人硬件测试 **Mock Demo**。一台 Ubuntu 22.04 笔记本运行 Robot A、Robot B 和 PySide6 地面站。默认全 Mock；另提供笔记本 UVC 摄像头接入，机器人真实驱动仍未实现。不是生产控制系统。
+ROS 2 Humble 双机器人硬件测试 **Mock Demo**。一台 Ubuntu 22.04 笔记本运行 Robot A、Robot B 和 PySide6 地面站。默认全 Mock；另提供 UVC 摄像头及 Robot A 现场真实监控配置。不是生产控制系统。
+
+Robot A 远程接入进度、启动方式和未完成项见 [现场接入记录](docs/RobotA远程接入记录.md)：USB/D456 彩色和深度预览、MID360s 数据计数、RM75 状态已验证；真实电机控制后端已编译，实机联调因 EtherCAT 通信错误暂停，未完成运动验收。原有 Mock 配置保持独立。
 
 详细文档：[使用指南](docs/使用指南.md) · [后续配置指南](docs/后续配置指南.md)。
 

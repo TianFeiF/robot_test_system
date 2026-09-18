@@ -2,20 +2,24 @@
 import logging
 import threading
 import time
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from rclpy.qos import qos_profile_sensor_data
 from robot_test_core.adapters import CameraAdapter
 
 class CameraStream:
-    def __init__(self, node, adapter: CameraAdapter, fps: float, camera_id: str):
+    def __init__(self, node, adapter: CameraAdapter, fps: float, camera_id: str, transport: str = 'raw'):
         self.node = node
         self.camera_id = camera_id
         self.adapter = adapter
+        if transport not in ('raw', 'compressed'):
+            raise ValueError('Camera transport must be raw or compressed')
+        self.compressed = transport == 'compressed'
         self.period = 1.0 / max(1.0, min(float(fps), 10.0))
         self.lock = threading.Lock()
         self.latest = None
         self.quit = threading.Event()
-        self.publisher = node.create_publisher(Image, f'cameras/{camera_id}/image_raw', qos_profile_sensor_data)
+        topic = f'cameras/{camera_id}/image_raw' + ('/compressed' if self.compressed else '')
+        self.publisher = node.create_publisher(CompressedImage if self.compressed else Image, topic, qos_profile_sensor_data)
         self.timer = node.create_timer(self.period, self.publish)
         self.thread = threading.Thread(target=self.capture, name=f'capture-{camera_id}', daemon=True)
         self.thread.start()
@@ -27,12 +31,19 @@ class CameraStream:
             try:
                 frame = self.adapter.get_frame()
                 if frame is not None:
-                    msg = Image()
-                    msg.height, msg.width = frame.shape[:2]
-                    msg.encoding = 'bgr8'
+                    if self.compressed:
+                        import cv2
+                        ok, encoded = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 75])
+                        if not ok:
+                            raise RuntimeError('JPEG encoding failed')
+                        msg = CompressedImage(format='bgr8; jpeg compressed bgr8', data=encoded.tobytes())
+                    else:
+                        msg = Image()
+                        msg.height, msg.width = frame.shape[:2]
+                        msg.encoding = 'bgr8'
+                        msg.step = msg.width * 3
+                        msg.data = frame.tobytes()
                     msg.header.frame_id = f'{self.node.robot_id}/{self.camera_id}'
-                    msg.step = msg.width * 3
-                    msg.data = frame.tobytes()
                     msg.header.stamp.sec, msg.header.stamp.nanosec = divmod(time.time_ns(), 10**9)
                     with self.lock:
                         self.latest = msg

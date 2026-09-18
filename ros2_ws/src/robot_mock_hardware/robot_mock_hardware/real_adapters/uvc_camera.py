@@ -23,6 +23,11 @@ class UVCCameraAdapter(CameraAdapter):
         self._frames = self._drops = self._disconnects = self._reconnects = 0
         self._width = self._height = 0
         self._error = 'Not connected'
+        self._rgb_device = None
+        self._registry = None
+        if config.get('rgb_selector'):
+            from .rgb_devices import REGISTRY
+            self._registry = REGISTRY
 
     def connect(self) -> None:
         # RobotController calls this on its own thread: defer hardware open to get_frame.
@@ -40,8 +45,12 @@ class UVCCameraAdapter(CameraAdapter):
 
     def _release(self) -> None:
         capture, self._capture = self._capture, None
-        if capture is not None:
-            capture.release()
+        try:
+            if capture is not None:
+                capture.release()
+        finally:
+            if self._registry:
+                self._registry.release(self)
 
     def disconnect(self) -> None:
         with self._state_lock:
@@ -58,8 +67,18 @@ class UVCCameraAdapter(CameraAdapter):
         if self._factory:
             return self._factory(self.device)
         import cv2
+        if self._registry:
+            selected = self._registry.acquire(self, self.config['rgb_selector'])
+            with self._state_lock:
+                self.device = selected['device']
+                self._rgb_device = selected
         cap = cv2.VideoCapture(self.device, cv2.CAP_V4L2)
         if cap.isOpened():
+            if self._rgb_device:
+                formats = self._rgb_device['formats']
+                preferred_format = 'MJPG' if 'MJPG' in formats else 'YUYV' if 'YUYV' in formats else None
+                if preferred_format:
+                    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*preferred_format))
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, int(self.config.get('width', 640)))
             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, int(self.config.get('height', 480)))
             cap.set(cv2.CAP_PROP_FPS, float(self.config.get('fps', 5)))
@@ -84,6 +103,8 @@ class UVCCameraAdapter(CameraAdapter):
                 ok, frame = self._capture.read()
                 if not ok or frame is None:
                     raise RuntimeError(f'No frame from {self.device}')
+                if frame.ndim != 3 or frame.shape[2] != 3:
+                    raise RuntimeError(f'{self.device} did not produce a BGR color frame')
                 now = time.monotonic()
                 with self._state_lock:
                     requested = self._requested
@@ -132,4 +153,5 @@ class UVCCameraAdapter(CameraAdapter):
                                 dict(frame_count=self._frames, drop_count=self._drops,
                                      disconnect_count=self._disconnects, reconnect_count=self._reconnects,
                                      fps=round(self._fps, 1) if fresh else 0.0, device=str(self.device),
+                                     usb_interface=self._rgb_device['key'] if self._rgb_device else '',
                                      width=self._width, height=self._height, backend='uvc'))

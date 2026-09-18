@@ -7,7 +7,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from std_srvs.srv import Trigger, SetBool
-from robot_test_msgs.msg import RobotHeartbeat, JogCommand
+from robot_test_msgs.msg import RobotHeartbeat, JogCommand, TorqueCommand
 from robot_test_core.logger import CsvLogger
 from robot_test_core.config import camera_configs
 from .camera_stream import CameraStream
@@ -33,7 +33,7 @@ class RobotTestAgent(Node):
         self.controller = RobotController(motors, devices, self.config, self.event)
         self.extensions = TestExtensions(self)
         self.camera_streams = [
-            CameraStream(self, devices[name], settings.get('fps', 5), name)
+            CameraStream(self, devices[name], settings.get('fps', 5), name, settings.get('transport', 'raw'))
             for name, settings in camera_configs(self.config).items()
             if isinstance(devices.get(name), CameraAdapter)
         ]
@@ -44,6 +44,7 @@ class RobotTestAgent(Node):
         self.diag = self.create_publisher(DiagnosticArray, 'diagnostics', 10)
         qos = QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT, durability=DurabilityPolicy.VOLATILE)
         self.create_subscription(JogCommand, 'jog_command', self.on_jog, qos)
+        self.create_subscription(TorqueCommand, 'torque_command', self.on_torque, qos)
         self.create_service(Trigger, 'stop', self.on_stop)
         self.create_service(SetBool, 'arm', self.on_arm)
         self.create_timer(0.01, self.tick)
@@ -105,6 +106,19 @@ class RobotTestAgent(Node):
         self.sequence += 1
         self.hb.publish(msg)
 
+    def on_torque(self, msg: TorqueCommand) -> None:
+        stamp = msg.stamp.sec * 10**9 + msg.stamp.nanosec
+        age = (self.get_clock().now().nanoseconds - stamp) / 1e9
+        if stamp <= self.command_epoch_ns or not 0 <= age < self.controller.timeout:
+            return
+        try:
+            self.controller.torque(msg.axis, msg.torque, time.monotonic())
+        except (RuntimeError, ValueError) as exc:
+            self.get_logger().debug(str(exc))
+        except Exception as exc:
+            self.controller.stop('TORQUE_ERROR')
+            self.event('TORQUE_ERROR', str(exc))
+
     def diagnostics(self) -> None:
         msg = DiagnosticArray()
         msg.header.stamp = self.get_clock().now().to_msg()
@@ -112,6 +126,7 @@ class RobotTestAgent(Node):
         system = DiagnosticStatus(name='System', hardware_id=self.robot_id, level=bytes([0]), message=self.controller.state.value)
         system.values = [KeyValue(key='auto_state', value=self.controller.auto.state.value if self.controller.auto else 'IDLE'), KeyValue(key='armed', value=str(self.controller.armed)), KeyValue(key='control_mode', value=self.controller.mode.value)]
         msg.status.append(system)
+        system.values.append(KeyValue(key='monitor_only', value=str(bool(self.config.get('robot', {}).get('monitor_only', False)))))
         for name in self.controller.all_devices:
             status = self.controller.status(name)
             item = DiagnosticStatus(name=name, hardware_id=self.robot_id, level=bytes([levels[status.state]]), message=status.state.value + ': ' + status.detail)

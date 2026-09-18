@@ -13,6 +13,8 @@ class DeviceAdapter(ABC):
         """Poll a real backend, advance a simulated backend. Must not block."""
 
 class MotorAdapter(DeviceAdapter):
+    def set_torque(self, torque: float) -> None:
+        raise NotImplementedError('This motor does not support torque control')
     @abstractmethod
     def enable(self) -> None: ...
     @abstractmethod

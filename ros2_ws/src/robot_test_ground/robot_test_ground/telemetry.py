@@ -18,7 +18,13 @@ def telemetry_cells(name: str, device: dict, online: bool) -> list:
     position = number(values['position']) if 'position' in values else '—'
     velocity = number(values['velocity']) if 'velocity' in values else '—'
     if 'position' in values:
-        keys = [('enabled', 'enabled'), ('error_count', 'err'), ('reconnect_count', 'reconnect')]
+        keys = [('enabled', 'enabled'), ('error_code', 'code'), ('error_count', 'err'), ('reconnect_count', 'reconnect'),
+                ('slave_position', 'slave'), ('position_unit', 'pos unit'), ('velocity_unit', 'vel unit'),
+                ('torque_raw', 'torque raw'), ('operation_mode', 'mode')]
+    elif 'arm_errors' in values:
+        keys = [('arm_errors', 'arm errors'), ('joint_degrees', 'joint deg'), ('sample_count', 'samples')]
+    elif values.get('backend') == 'ethercat_monitor':
+        keys = [('slave_count', 'slaves'), ('sample_count', 'samples'), ('error_count', 'err'), ('recover_count', 'recover'), ('rx_crc_errors', 'NIC CRC')]
     elif 'points_per_second' in values:
         keys = [('scan_hz', 'Hz'), ('points_per_second', 'pts/s'), ('packet_count', 'packets'), ('drop_count', 'drop'), ('error_count', 'err'), ('reconnect_count', 'reconnect')]
     elif 'frame_count' in values:

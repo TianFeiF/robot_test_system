@@ -15,6 +15,19 @@ def create_motor_adapter(config: dict) -> MotorAdapter:
 
 def create_device_adapter(kind: str, config: dict) -> DeviceAdapter:
     backend = config.get('backend', 'mock')
+    if kind == 'ethercat' and backend in ('ethercat', 'eyou'):
+        from .real_adapters.ethercat import EtherCATBus
+        return EtherCATBus(config)
+    if kind == 'camera' and backend == 'realsense_depth':
+        from .real_adapters.realsense_depth import RealSenseDepthAdapter
+        return RealSenseDepthAdapter(config)
+    if kind == 'lidar' and backend == 'livox':
+        from .real_adapters.livox import LivoxMonitor
+        return LivoxMonitor(config)
+    if backend in ('ethercat_monitor', 'rm75_monitor', 'unavailable'):
+        from .real_adapters.telemetry import EtherCATMonitor, RM75Monitor, UnavailableDevice
+        return {'ethercat_monitor': EtherCATMonitor, 'rm75_monitor': RM75Monitor,
+                'unavailable': UnavailableDevice}[backend](config)
     if kind == 'camera' and backend == 'uvc':
         from .real_adapters.uvc_camera import UVCCameraAdapter
         return UVCCameraAdapter(config)
@@ -47,13 +60,20 @@ DEVICE_BACKENDS['real'] = real_device
 
 def create_hardware(config: dict):
     """Axes inherit their bus backend; only the factory resolves backend wiring."""
+    devices = {name: create_device_adapter(name, settings)
+               for name, settings in config['hardware'].items() if settings.get('enabled')}
     motors = {}
     for axis, settings in config['axes'].items():
         bus = config['hardware'][settings['bus']]
         if bus.get('enabled', False):
-            motors[axis] = create_motor_adapter({**bus, **settings})
-    devices = {name: create_device_adapter(name, settings)
-               for name, settings in config['hardware'].items() if settings.get('enabled')}
+            if bus.get('backend') in ('ethercat', 'eyou'):
+                from .real_adapters.ethercat import EtherCATMotor
+                motors[axis] = EtherCATMotor(devices[settings['bus']], settings)
+            elif bus.get('backend') == 'ethercat_monitor':
+                from .real_adapters.telemetry import EtherCATReadOnlyMotor
+                motors[axis] = EtherCATReadOnlyMotor(devices[settings['bus']], settings)
+            else:
+                motors[axis] = create_motor_adapter({**bus, **settings})
     devices.update({name: create_device_adapter('camera', settings)
                     for name, settings in camera_configs(config).items()})
     return motors, devices

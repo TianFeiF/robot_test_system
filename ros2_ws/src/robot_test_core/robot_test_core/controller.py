@@ -51,6 +51,8 @@ class RobotController:
         return all(self.status(n).state == DeviceState.OK for n in names)
 
     def arm(self) -> None:
+        if self.config.get('robot', {}).get('monitor_only', False) or not self.motors:
+            raise RuntimeError('Monitor-only deployment: motion is unavailable')
         if not self.motion_healthy():
             raise RuntimeError('Motion device fault; clear fault before arming')
         self.stop('ARM_RESET')
@@ -72,6 +74,8 @@ class RobotController:
             raise RuntimeError('Motion disarmed')
         if axis not in self.motors:
             raise ValueError('Unknown axis')
+        if self.config['axes'][axis].get('control_mode') == 'torque':
+            raise ValueError('Torque axis rejects velocity commands')
         if not math.isfinite(velocity) or abs(velocity) > self.config['axes'][axis]['max_velocity']:
             raise ValueError('Velocity outside configured limit')
         if not self.motion_healthy():
@@ -80,6 +84,21 @@ class RobotController:
         self.motors[axis].jog(velocity)
         self.last_commands[axis] = now
         self.state = RobotState.RUNNING if velocity else RobotState.READY
+
+    def torque(self, axis: str, torque: float, now: float) -> None:
+        if not self.armed or self.mode != ControlMode.MANUAL:
+            raise RuntimeError('Motion disarmed')
+        cfg = self.config['axes'].get(axis, {})
+        if axis not in self.motors or cfg.get('control_mode') != 'torque':
+            raise ValueError('Not a torque axis')
+        if not math.isfinite(torque) or not 0 <= torque <= cfg['torque_raw_max']:
+            raise ValueError('Torque outside configured limit')
+        if not self.motion_healthy():
+            self.stop('MOTION_FAULT')
+            raise RuntimeError('Motion device fault')
+        self.motors[axis].set_torque(torque)
+        self.last_commands[axis] = now
+        self.state = RobotState.RUNNING if torque else RobotState.READY
 
     def start_auto(self) -> None:
         cfg = self.config['test']['auto_cycle']

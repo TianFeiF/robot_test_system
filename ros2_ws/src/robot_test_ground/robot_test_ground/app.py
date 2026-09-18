@@ -23,7 +23,9 @@ class GroundWindow(QMainWindow):
         self.active_jog = None
         self.auto_robots = set()
         self.token = 0
-        hardware_label = 'UVC CAMERA + MOCK MOTORS' if any(c.get('backend') == 'uvc' for cfg in configs.values() for c in cfg.get('cameras', {}).values()) else 'MOCK HARDWARE TEST'
+        hardware_label = ('REAL HARDWARE / MONITOR ONLY' if any(cfg.get('robot', {}).get('monitor_only') for cfg in configs.values()) else
+                          'REAL HARDWARE TEST' if any(cfg.get('hardware', {}).get('ethercat', {}).get('backend') in ('ethercat', 'eyou') for cfg in configs.values()) else
+                          'UVC CAMERA + MOCK MOTORS' if any(c.get('backend') == 'uvc' for cfg in configs.values() for c in cfg.get('cameras', {}).values()) else 'MOCK HARDWARE TEST')
         self.setWindowTitle('Robot Hardware Test System v0.1 — ' + hardware_label)
         self.resize(1920, 1080)
         self.setFont(QFont('DejaVu Sans', 10))
@@ -36,6 +38,8 @@ class GroundWindow(QMainWindow):
         layout.setSpacing(4)
         title_row = QHBoxLayout()
         title_row.addWidget(QLabel(hardware_label + ' | Software STOP ≠ hardware emergency stop | F11: full screen / Esc: window'))
+        if any(cfg.get('robot', {}).get('monitor_only') for cfg in configs.values()):
+            layout.addWidget(QLabel('MONITOR ONLY: JOG / AUTO / hardware STOP unavailable. Axis units in status; positions are not homed.'))
         close_button = QPushButton('EXIT / STOP ALL')
         close_button.clicked.connect(self.close)
         title_row.addWidget(close_button)
@@ -88,6 +92,7 @@ class GroundWindow(QMainWindow):
         self.stop_button.clicked.connect(self.stop_selected)
         self.stop_all_button.clicked.connect(self.stop_all)
         self.test_panel = TestPanel(self, layout)
+        self.select_robot(self.robot.currentText())
         self.log = QPlainTextEdit()
         self.log.setReadOnly(True)
         self.log.setMaximumBlockCount(1000)
@@ -111,6 +116,11 @@ class GroundWindow(QMainWindow):
         self.axis.clear()
         cfg = self.configs[rid]
         self.axis.addItems([name for name, axis in cfg['axes'].items() if cfg['hardware'][axis['bus']].get('enabled')])
+        if hasattr(self, 'test_panel'):
+            controllable = not cfg.get('robot', {}).get('monitor_only', False) and bool(self.axis.count())
+            self.minus.setEnabled(controllable)
+            self.plus.setEnabled(controllable)
+            self.test_panel.start.setEnabled(controllable)
 
     def press_jog(self, direction):
         self.release_jog()
@@ -120,7 +130,14 @@ class GroundWindow(QMainWindow):
             return
         self.token += 1
         axis = self.axis.currentText()
-        speed = self.configs[rid]['axes'][axis]['jog_velocity'] * direction
+        if not axis or self.configs[rid].get('robot', {}).get('monitor_only'):
+            self.log.appendPlainText('JOG rejected: monitoring only; no motion interface')
+            return
+        cfg = self.configs[rid]['axes'][axis]
+        if cfg.get('control_mode') == 'torque':
+            speed = cfg['jog_torque'] if direction > 0 else 0.0
+        else:
+            speed = cfg['jog_velocity'] * direction
         self.active_jog = [rid, axis, speed, self.token, False]
         self.bridge.submit(rid, 'arm', self.token)
 
@@ -143,7 +160,10 @@ class GroundWindow(QMainWindow):
             self.bridge.submit(rid, 'auto_keepalive')
         if self.active_jog and self.active_jog[4]:
             rid, axis, speed, _, _ = self.active_jog
-            self.bridge.submit(rid, 'jog', axis=axis, velocity=speed)
+            if self.configs[rid]['axes'][axis].get('control_mode') == 'torque':
+                self.bridge.submit(rid, 'torque', axis=axis, torque=speed)
+            else:
+                self.bridge.submit(rid, 'jog', axis=axis, velocity=speed)
 
     def release_jog(self):
         if self.active_jog:
@@ -190,9 +210,17 @@ class GroundWindow(QMainWindow):
                 self.auto_robots.discard(rid)
             if self.active_jog and self.active_jog[0] == rid and not model.online:
                 self.release_jog()
-        online = self.bridge.snapshot(self.robot.currentText()).online
-        self.plus.setEnabled(online)
-        self.minus.setEnabled(online)
+        rid = self.robot.currentText()
+        online = self.bridge.snapshot(rid).online
+        controllable = online and not self.configs[rid].get('robot', {}).get('monitor_only', False)
+        cfg = self.configs[rid]['axes'].get(self.axis.currentText(), {})
+        self.plus.setText(f"TORQUE {cfg.get('jog_torque', 0)} (hold)" if cfg.get('control_mode') == 'torque' else 'JOG + (hold)')
+        self.minus.setText('TORQUE 0 (hold)' if cfg.get('control_mode') == 'torque' else 'JOG − (hold)')
+        if cfg.get('requires_zero') and self.configs[rid]['hardware']['ethercat'].get('z_zero_counts') is None:
+            controllable = False
+        self.plus.setEnabled(controllable)
+        self.minus.setEnabled(controllable)
+        self.test_panel.start.setEnabled(controllable and self.configs[rid]['test']['auto_cycle']['enabled'])
 
     def eventFilter(self, obj, event):
         if event.type() in (QEvent.ApplicationDeactivate, QEvent.WindowDeactivate) and hasattr(self, 'active_jog'):
