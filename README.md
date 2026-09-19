@@ -1,8 +1,8 @@
 # Robot Hardware Test System v0.1
 
 三台机器开机联网后，在地面站工程目录执行 `./scripts/start_site_all.sh`，即可通过免密 SSH
-启动 A/B 监控并打开双机地面站。关闭该地面站或在启动终端按 Ctrl+C，会停止本脚本启动的
-两端监控会话。这是监控入口，不使能电机；B 的 CAN 控制后端不在此模式中启动。
+启动 A/B 真实控制后端并打开双机地面站。关闭该地面站或在启动终端按 Ctrl+C，会停止本脚本启动的
+两端控制会话。启动脚本本身不会 ARM 或发送运动指令；A/B 都由地面站显式 ARM 后才允许运动。
 不需要重新构建，也不需要逐台开终端。若已有 Agent 在运行，脚本会拒绝重复启动。
 
 ROS 2 Humble 双机器人硬件测试 **Mock Demo**。一台 Ubuntu 22.04 笔记本运行 Robot A、Robot B 和 PySide6 地面站。默认全 Mock；另提供 UVC 摄像头及 Robot A 现场真实监控配置。不是生产控制系统。
@@ -25,7 +25,7 @@ Robot A 远程接入进度与验证边界见 [现场接入记录](docs/RobotA远
 
 Robot B（`phi@192.168.10.63`）部署记录见 [Robot B 接入记录](docs/RobotB远程接入记录.md)。
 B 上使用 `./scripts/start_robot_b_site.sh` 监控，地面站使用
-`./scripts/start_ground_dual.sh` 同时查看 A/B（A 四路 RGB，B 三路 RGB）。
+`./scripts/start_ground_dual.sh` 同时查看和控制 A/B（A 四路 RGB，B 三路 RGB）。
 B 新增 CANopen 工程位于 `/home/phi/robot_test_system_git`：控制配置已启用 CAN 和两个支撑轴，
 site 监控配置仍不启动 CAN。运行控制入口前先停止已有监控实例。
 
