@@ -97,8 +97,9 @@ class TelemetryTests(unittest.TestCase):
         controller = RobotController(motors, devices, config)
         with self.assertRaisesRegex(RuntimeError, 'Monitor-only'):
             controller.arm()
-        controller.stop()
-        self.assertEqual(set(controller.stop_errors), set(motors))
+        self.assertFalse(controller.stop())
+        self.assertEqual(controller.stop_errors, {})
+        self.assertEqual(controller.exceptions, {})
         self.assertFalse(controller.armed)
 
 

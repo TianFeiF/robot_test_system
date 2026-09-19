@@ -18,6 +18,10 @@ Robot A 远程接入进度与验证边界见 [现场接入记录](docs/RobotA远
 卸载旧的开机服务，在 Robot A 执行 `./scripts/remove_legacy_robot_service.sh` 并输入 sudo 密码。
 脚本先备份、停止并禁用 `ros2_robot.service`，再删除其 unit；保留旧工程和驱动库。
 
+Robot B（`phi@192.168.10.63`）部署记录见 [Robot B 接入记录](docs/RobotB远程接入记录.md)。
+B 上使用 `./scripts/start_robot_b_site.sh` 监控，地面站使用
+`./scripts/start_ground_dual.sh` 同时查看 A/B。B 的 CAN 和两个支撑轴暂不加载。
+
 详细文档：[使用指南](docs/使用指南.md) · [后续配置指南](docs/后续配置指南.md)。
 
 只有笔记本也能测试：[笔记本摄像头测试](docs/笔记本摄像头测试.md)，运行 `./scripts/start_laptop_camera_demo.sh`。

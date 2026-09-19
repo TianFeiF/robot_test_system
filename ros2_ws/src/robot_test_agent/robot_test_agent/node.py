@@ -62,21 +62,21 @@ class RobotTestAgent(Node):
         try:
             if request.data:
                 self.controller.arm()
+                response.success = True
+                response.message = 'Armed'
             else:
-                self.controller.stop('DISARM')
+                response.success = self.controller.stop('DISARM')
+                response.message = self.controller.stop_message
             self.command_epoch_ns = self.get_clock().now().nanoseconds
-            response.success = True
-            response.message = 'Armed' if request.data else 'Disarmed'
         except Exception as exc:
             response.success = False
             response.message = str(exc)
         return response
 
     def on_stop(self, request, response):
-        self.controller.stop()
+        response.success = self.controller.stop()
         self.command_epoch_ns = self.get_clock().now().nanoseconds
-        response.success = not bool(self.controller.stop_errors)
-        response.message = 'Stopped and disarmed' if response.success else 'Stopped; inspect device errors'
+        response.message = self.controller.stop_message
         return response
 
     def on_jog(self, msg: JogCommand) -> None:

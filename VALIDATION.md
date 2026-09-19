@@ -63,7 +63,7 @@ A/B ONLINE、Heartbeat 和 Diagnostics；按住 JOG 位置增长、松手停车�
 - 相关 3 个包实际 build 成功，11 个单元测试通过。43 项运行验收通过，含两台雷达计数增长、故障变红与计数停止、恢复/重连，以及原 P0/P1 和 1920×1080 无裁切检查。
 - 结果：`logs/lidar_results.txt`；截图：`logs/lidar_1920x1080.png`；CSV：`logs/lidar_acceptance/`。
 - 真实雷达驱动/点云尚未接入；模拟 packet/drop 数不能用来反推网桥实际吞吐。带宽估算及官方来源见 `docs/无线网桥与雷达预算.md`。
-# Robot A 现场 RGB 与启动配置更新（2026-09-19）
+## Robot A 现场 RGB 与启动配置更新（2026-09-19）
 
 - 真实网络对照：44/23/24 KB 的三路 5 Hz 测试消息，默认 DDS 下最长间隔 8.2 秒；
   UDP `maxMessageSize=1400` 后最长 0.21 秒，无超过 2 秒的间隔。保留 SHM，未修改系统网络参数。
@@ -77,3 +77,15 @@ A/B ONLINE、Heartbeat 和 Diagnostics；按住 JOG 位置增长、松手停车�
 - 机器人复查旧 `ros2_robot.service` 为 `LoadState=not-found`、inactive。
 - 结果位于 `logs/rgb_mtu_validation/`，实际 RGB 接收 CSV 位于
   `logs/rgb_mtu_validation_fixed/`。本次为短时验证，不代表长时间或热插拔验收完成。
+
+## Robot B 部署验证（2026-09-19）
+
+- `phi@192.168.10.63:/home/phi/robot_test_system`：5 个 ROS 包构建成功；B 的 CAN 与两个支撑轴未加载。
+- 三路 RGB 60 秒跨机解码 300/289/300 帧，最长间隔 0.405 秒，无解码错误或超过两秒间隔。
+- MID360s `192.168.10.73`：约 20 万点/秒、200 IMU 包/秒，命令错误计数 0。
+- 初始 EtherCAT 权限不足，经操作者授权配置 `cap_net_raw` 后，旧 20250807 SDK 仍报状态切换失败。
+  在项目私有目录部署 20260109 SDK 并重新编译后，四从站均 OP，PDO 反馈正常，API/时序错误 0。
+- 最终只读 ROS/Qt 集成检查通过：B 在线、三路预览、雷达、EtherCAT 正常；CAN/支撑轴不存在于设备列表。
+  四轴均未使能，未执行运动或找零。截图时 A 不在线，未操作 A 的运行状态。
+- 当前 B 保留临时用户监控服务运行，未设置开机自启；SDK 实时调度权限警告仍存在，运动实时性未验收。
+- 结果：`logs/robot_b_deploy_validation/{rgb.json,final_status.json,dual_monitor.png}`。

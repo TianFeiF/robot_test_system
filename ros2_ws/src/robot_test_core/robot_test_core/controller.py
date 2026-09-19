@@ -20,6 +20,7 @@ class RobotController:
         self.last_commands: Dict[str, float] = {}
         self.exceptions: Dict[str, str] = {}
         self.stop_errors: Dict[str, str] = {}
+        self.stop_message = ''
         self.timeout = float(config['test']['watchdog_timeout_ms']) / 1000
         if not 0 < self.timeout <= 0.5:
             raise ValueError('Demo watchdog must be in (0, 500] ms')
@@ -31,6 +32,10 @@ class RobotController:
                 self.exceptions[name] = str(exc)
                 event('CONNECT_ERROR', f'{name}: {exc}')
         self.state = RobotState.READY
+
+    @property
+    def monitor_only(self) -> bool:
+        return bool(self.config.get('robot', {}).get('monitor_only', False))
 
     @property
     def all_devices(self) -> Dict[str, DeviceAdapter]:
@@ -115,7 +120,11 @@ class RobotController:
         self.state = RobotState.RUNNING
         self.event('AUTO_START', axis)
 
-    def stop(self, reason: str = 'STOP') -> None:
+    def stop(self, reason: str = 'STOP') -> bool:
+        if self.monitor_only:
+            self.stop_message = 'Monitor-only deployment: hardware STOP/disable unavailable; no hardware command sent'
+            self.event('STOP_UNSUPPORTED', f'{reason}: {self.stop_message}')
+            return False
         # Disarm first: queued/repeated JOG messages cannot restart after STOP.
         self.armed = False
         self.mode = ControlMode.MONITOR
@@ -133,7 +142,9 @@ class RobotController:
                     self.stop_errors[name] = detail
                     self.event('STOP_ERROR', f'{name}: {detail}')
         self.state = RobotState.FAULT if self.stop_errors else RobotState.STOPPED
-        self.event(reason, 'Stop attempted; inspect motor errors' if self.stop_errors else 'All motors stopped and disarmed')
+        self.stop_message = 'Stop attempted; inspect motor errors' if self.stop_errors else 'All motors stopped and disarmed'
+        self.event(reason, self.stop_message)
+        return not bool(self.stop_errors)
 
     def tick(self, now: float) -> None:
         dt = max(0.0, now - self.last_tick)
@@ -159,7 +170,10 @@ class RobotController:
                     self.stop('MOTION_FAULT')
 
     def close(self) -> None:
-        self.stop('SHUTDOWN')
+        if self.monitor_only:
+            self.event('SHUTDOWN', 'Closing monitor resources; no hardware STOP/disable commanded')
+        else:
+            self.stop('SHUTDOWN')
         for name, adapter in self.all_devices.items():
             try:
                 adapter.disconnect()

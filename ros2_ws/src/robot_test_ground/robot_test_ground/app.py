@@ -183,11 +183,15 @@ class GroundWindow(QMainWindow):
         self.bridge.submit(self.robot.currentText(), 'stop')
 
     def stop_all(self):
+        self._stop_all(include_monitors=True)
+
+    def _stop_all(self, include_monitors):
         self.token += 1
         self.auto_robots.clear()
         self.release_jog()
         for rid in self.configs:
-            self.bridge.submit(rid, 'stop')
+            if include_monitors or not self.configs[rid].get('robot', {}).get('monitor_only', False):
+                self.bridge.submit(rid, 'stop')
 
     def refresh(self):
         for rid in self.configs:
@@ -228,7 +232,7 @@ class GroundWindow(QMainWindow):
         return super().eventFilter(obj, event)
 
     def closeEvent(self, event):
-        self.stop_all()
+        self._stop_all(include_monitors=False)
         # Keep executor alive briefly so STOP service calls can be dispatched.
         QTimer.singleShot(300, QApplication.instance().quit)
         self.hide()
