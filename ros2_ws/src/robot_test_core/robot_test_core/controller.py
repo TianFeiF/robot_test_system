@@ -96,8 +96,10 @@ class RobotController:
         cfg = self.config['axes'].get(axis, {})
         if axis not in self.motors or cfg.get('control_mode') != 'torque':
             raise ValueError('Not a torque axis')
-        if not math.isfinite(torque) or not 0 <= torque <= cfg['torque_raw_max']:
-            raise ValueError('Torque outside configured limit')
+        torque_min = cfg.get('torque_raw_min', 0)
+        torque_max = cfg['torque_raw_max']
+        if not math.isfinite(torque) or not torque_min <= torque <= torque_max:
+            raise ValueError(f'Torque outside configured limit [{torque_min}, {torque_max}]')
         if not self.motion_healthy():
             self.stop('MOTION_FAULT')
             raise RuntimeError('Motion device fault')

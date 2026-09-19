@@ -43,6 +43,22 @@ axes:
     requires_zero: false
     position_min: 0
     position_max: 0.3
+  support_left:
+    bus: canopen
+    node_id: 1
+    control_mode: torque
+    torque_raw_min: -1000
+    torque_raw_max: 1000
+    jog_torque: 50
+    torque_sign: 1
+  support_right:
+    bus: canopen
+    node_id: 2
+    control_mode: torque
+    torque_raw_min: -1000
+    torque_raw_max: 1000
+    jog_torque: 50
+    torque_sign: 1
 hardware:
   ethercat:
     enabled: true
@@ -64,8 +80,17 @@ hardware:
     stale_sec: 5
     model: MID360s
   canopen:
-    enabled: false
-    backend: real
+    enabled: true
+    backend: eyou_canopen
+    interface: can0
+    device_index: 0
+    bitrate: 1000000
+    executable: /home/phi/robot_test_system_git/.local-deps/bin/eyou_canopen_agent
+    sdk_lib: /home/phi/robot_test_system_git/.local-deps/eyou_canopen_sdk/lib
+    max_abs_torque: 1000
+    torque_slope: 500
+    watchdog_ms: 500
+    log_file: /home/phi/robot_test_system_git/logs/eyou_canopen_agent.log
 test:
   watchdog_timeout_ms: 500
   heartbeat_hz: 1.0

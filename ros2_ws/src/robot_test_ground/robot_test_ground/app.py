@@ -135,7 +135,7 @@ class GroundWindow(QMainWindow):
             return
         cfg = self.configs[rid]['axes'][axis]
         if cfg.get('control_mode') == 'torque':
-            speed = cfg['jog_torque'] if direction > 0 else 0.0
+            speed = cfg['jog_torque'] * direction
         else:
             speed = cfg['jog_velocity'] * direction
         self.active_jog = [rid, axis, speed, self.token, False]
@@ -219,7 +219,11 @@ class GroundWindow(QMainWindow):
         controllable = online and not self.configs[rid].get('robot', {}).get('monitor_only', False)
         cfg = self.configs[rid]['axes'].get(self.axis.currentText(), {})
         self.plus.setText(f"TORQUE {cfg.get('jog_torque', 0)} (hold)" if cfg.get('control_mode') == 'torque' else 'JOG + (hold)')
-        self.minus.setText('TORQUE 0 (hold)' if cfg.get('control_mode') == 'torque' else 'JOG − (hold)')
+        self.minus.setText(
+            f"TORQUE -{cfg.get('jog_torque', 0)} (hold)"
+            if cfg.get('control_mode') == 'torque'
+            else 'JOG − (hold)'
+        )
         if cfg.get('requires_zero') and self.configs[rid]['hardware']['ethercat'].get('z_zero_counts') is None:
             controllable = False
         self.plus.setEnabled(controllable)
