@@ -206,12 +206,12 @@ class GroundBridge(Node):
                 msg = JogCommand()
                 msg.stamp = Time(sec=submitted // 10**9, nanosec=submitted % 10**9)
                 msg.axis = data['axis']
-                msg.velocity = data['velocity']
+                msg.velocity = float(data['velocity'])
                 self.jog_publishers[rid].publish(msg)
                 continue
             if action == 'torque':
                 msg = TorqueCommand(stamp=Time(sec=submitted // 10**9, nanosec=submitted % 10**9),
-                                    axis=data['axis'], torque=data['torque'])
+                                    axis=data['axis'], torque=float(data['torque']))
                 self.torque_publishers[rid].publish(msg)
                 continue
             client = self.service_clients[rid][action]
