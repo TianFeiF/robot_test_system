@@ -1,8 +1,47 @@
-# Robot A 远程接入记录（2026-09-18）
+# Robot A 远程接入记录
+
+## 2026-09-19：现场启动、视频分包与旧服务清理
+
+本节为最新状态。机器人启动控制配置现在只需：
+
+```bash
+./scripts/start_robot_a_control.sh
+```
+
+地面站使用 `./scripts/start_ground_site.sh`；机器人只读模式使用
+`./scripts/start_robot_a_site.sh`。三个入口默认 domain 30，仍允许显式指定
+`ROS_DOMAIN_ID`；`ROBOT_TEST_CONFIG_DIR` 仍可覆盖配置目录。启动控制配置不会自动使能。
+
+现场脚本通过 `scripts/site_network.sh` 加载 `config/fastdds_site.xml`，将 UDP
+`maxMessageSize` 限制为 1400 字节，保留同机 SHM。图像由 DDS 分片，避免大 UDP 包在
+1500 MTU 网络上形成大量 IP 分片。设置依据：[Fast DDS 2.6 transport 配置](https://fast-dds.docs.eprosima.com/en/2.6.x/fastdds/xml_configuration/transports.html)。
+只改现场进程的配置，未修改系统 sysctl 或网卡；显式设置的 RMW/profile 环境变量保留。
+**部署后两端都需重新启动现场进程**，已经运行的进程不会自动加载 XML。
+
+独立测试使用与三路 JPEG 接近的 44000/23000/24000 字节消息，每路 5 Hz，
+不读取相机、不加载电机。60 秒观测中，默认配置收到 145/144/143 条，最长间隔 8.2 秒；
+1400 字节配置收到 301/300/300 条，最长间隔 0.21 秒，没有超过 2 秒的间隔。
+地面站还观察到大量 IP 重组失败的累计计数；该计数包含其他程序流量，不能全部归因于本工程。
+
+现场相机已更换：USB Camera 现在在 USB 端口 5，另一台是端口 6 的
+`S-YUE 8MP USB Camera`，RealSense RGB 仍为端口 2 的 `1.3` 接口。
+site/control 两份配置均扩展 USB 名称匹配并更新首台相机优选路径。
+RGB 格式筛选和设备独占注册仍生效，避免把 RealSense 深度/红外节点当作彩色相机。
+
+旧 `ros2_robot.service` 已复查为 `LoadState=not-found`、inactive；开机不会再通过该
+unit 启动旧工程。`scripts/remove_legacy_robot_service.sh` 可用于清理同样的旧 unit，
+需要本机 sudo 密码，先备份再停止/禁用/删除。此次操作者执行时 unit 已不存在。
+旧的手动图传 `CAM_UDP/sender.py` 也已退出，避免占用相机；未删除其工程。
+
+测试产物：`logs/rgb_mtu_validation/`，包括网络对照 JSON、真实 RGB 解码结果和
+Mock ROS/Qt 回归日志。真实相机测试使用 `axes: {}`、`hardware: {}` 的临时监控配置，
+没有启动电机驱动。修正相机匹配后，地面站 60 秒成功解码 300/289/300 帧，
+最长间隔 0.214/0.404/0.215 秒，解码错误和超过两秒的间隔均为 0。
+当前结果属于短时验证，仍需现场长时间运行观察热插拔和链路变化。
 
 ## 晚间更新：机器人修改合并与 RGB 传输排查
 
-本节优先于下方早期接入记录。机器人目前由操作者启动 control 配置，使用
+以下为 2026-09-18 的历史状态。机器人当时由操作者启动 control 配置，使用
 `ROS_DOMAIN_ID=30`；本次未重启 Agent、未下发运动命令。当前 EtherCAT 使用 Eyou SDK，
 不是下方早期记录中的 IgH 只读方案。
 

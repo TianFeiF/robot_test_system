@@ -90,8 +90,8 @@ cameras:
     enabled: true
     backend: uvc
     rgb_selector:
-      name_regex: '^USB Camera:'
-      preferred_path: /dev/v4l/by-path/pci-0000:00:14.0-usb-0:1:1.0-video-index0
+      name_regex: 'USB Camera'
+      preferred_path: /dev/v4l/by-path/pci-0000:00:14.0-usb-0:5:1.0-video-index0
     width: 640
     height: 480
     fps: 5
@@ -112,7 +112,7 @@ cameras:
     enabled: true
     backend: uvc
     rgb_selector:
-      name_regex: '^USB Camera:'
+      name_regex: 'USB Camera'
       preferred_path: /dev/v4l/by-path/pci-0000:00:14.0-usb-0:6:1.0-video-index0
     width: 640
     height: 480

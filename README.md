@@ -2,7 +2,21 @@
 
 ROS 2 Humble 双机器人硬件测试 **Mock Demo**。一台 Ubuntu 22.04 笔记本运行 Robot A、Robot B 和 PySide6 地面站。默认全 Mock；另提供 UVC 摄像头及 Robot A 现场真实监控配置。不是生产控制系统。
 
-Robot A 远程接入进度、启动方式和未完成项见 [现场接入记录](docs/RobotA远程接入记录.md)：USB/D456 彩色和深度预览、MID360s 数据计数、RM75 状态已验证；真实电机控制后端已编译，实机联调因 EtherCAT 通信错误暂停，未完成运动验收。原有 Mock 配置保持独立。
+Robot A 远程接入进度与验证边界见 [现场接入记录](docs/RobotA远程接入记录.md)。现场使用三路 RGB、MID360 数据计数、RM75 状态和 Eyou EtherCAT 后端。现场启动脚本已加入 DDS 小包配置，三路真实 RGB 的 60 秒跨机解码验证无中断；长期稳定性仍需观察。原有 Mock 配置保持独立。
+
+现场启动（在工程目录执行，默认 `ROS_DOMAIN_ID=30`，两端需一致）：
+
+```bash
+# Robot A：真实控制配置，启动后仍需操作者使能
+./scripts/start_robot_a_control.sh
+# 地面站：现场监控界面
+./scripts/start_ground_site.sh
+```
+
+机器人只做监控时使用 `./scripts/start_robot_a_site.sh`。
+更新后请重启机器人 Agent 和地面站，使现场 DDS 配置生效；不要同时运行旧的相机发送程序。
+卸载旧的开机服务，在 Robot A 执行 `./scripts/remove_legacy_robot_service.sh` 并输入 sudo 密码。
+脚本先备份、停止并禁用 `ros2_robot.service`，再删除其 unit；保留旧工程和驱动库。
 
 详细文档：[使用指南](docs/使用指南.md) · [后续配置指南](docs/后续配置指南.md)。
 

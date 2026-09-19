@@ -63,3 +63,17 @@ A/B ONLINE、Heartbeat 和 Diagnostics；按住 JOG 位置增长、松手停车�
 - 相关 3 个包实际 build 成功，11 个单元测试通过。43 项运行验收通过，含两台雷达计数增长、故障变红与计数停止、恢复/重连，以及原 P0/P1 和 1920×1080 无裁切检查。
 - 结果：`logs/lidar_results.txt`；截图：`logs/lidar_1920x1080.png`；CSV：`logs/lidar_acceptance/`。
 - 真实雷达驱动/点云尚未接入；模拟 packet/drop 数不能用来反推网桥实际吞吐。带宽估算及官方来源见 `docs/无线网桥与雷达预算.md`。
+# Robot A 现场 RGB 与启动配置更新（2026-09-19）
+
+- 真实网络对照：44/23/24 KB 的三路 5 Hz 测试消息，默认 DDS 下最长间隔 8.2 秒；
+  UDP `maxMessageSize=1400` 后最长 0.21 秒，无超过 2 秒的间隔。保留 SHM，未修改系统网络参数。
+- 第一轮真实相机验收发现 S-YUE 相机名称未被旧选择器匹配，故该轮三路验收失败；
+  更新 site/control 中 USB 名称匹配与当前端口路径后重测通过。
+- 60 秒真实 RGB 验收：成功解码 300/289/300 帧，最大间隔 0.214/0.404/0.215 秒；
+  解码错误 0，超过两秒间隔 0。测试配置不包含电机或其他硬件。
+- 使用新 DDS 配置的隔离 domain 86 Mock P0 ROS/Qt 回归通过，包括三端通信、多相机故障恢复、
+  JOG 释放停车、Watchdog、STOP ALL、机器人断线/重连；这不是实机运动验收。
+- Shell 语法检查、XML 解析及 `git diff --check` 通过。
+- 机器人复查旧 `ros2_robot.service` 为 `LoadState=not-found`、inactive。
+- 结果位于 `logs/rgb_mtu_validation/`，实际 RGB 接收 CSV 位于
+  `logs/rgb_mtu_validation_fixed/`。本次为短时验证，不代表长时间或热插拔验收完成。
