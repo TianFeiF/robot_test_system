@@ -1,5 +1,18 @@
 # Robot B 部署记录（2026-09-19）
 
+## 2026-09-20 更新
+
+当前新增 CANopen 实现在 `/home/phi/robot_test_system_git`，与地面站当前仓库代码一致。
+控制配置定义 support_left/node 1、support_right/node 2、can0/1 Mbps，并启用 `eyou_canopen`。
+本次保留其代码、SDK 路径和参数，没有用旧配置覆盖。**下文“CAN 未加载”是首次部署的历史状态；
+当前控制配置启用 CAN，site 监控配置仍按原设置禁用 CAN。**
+
+本次验证使用 `_git` 工程的监控入口；该工程已有只读 STOP 修复，旧部署目录也已同步修复。
+只读 STOP/去使能会明确返回不支持，不再锁存轴错误；关闭监控只释放资源。
+没有执行 CAN 使能、力矩或其他运动验收。切换控制前须停止正在运行的监控实例，避免两个主站争用设备。
+
+地面站 `./scripts/start_ground_dual.sh` 现在显示 A 四路 RGB、B 三路 RGB。
+
 目标主机 `phi@192.168.10.63`（pc-02），免密 SSH；Ubuntu 22.04.5 x86_64、ROS 2 Humble。
 工程部署在 `/home/phi/robot_test_system`，保留原 `ros2_robot_ws`、CAN 和图传工程。
 

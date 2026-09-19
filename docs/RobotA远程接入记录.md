@@ -1,5 +1,19 @@
 # Robot A 远程接入记录
 
+## 2026-09-20：四路 RGB 与只读 STOP 修复
+
+- A 的 site/control 配置均新增 camera_4：第二台 RealSense 的 RGB 接口，
+  优选路径 `pci-0000:00:14.0-usb-0:4:1.3-video-index0`，当前为 `/dev/video14`。
+  原 RealSense RGB 为 `/dev/video6`；四路各自独占彩色节点，不打开深度/红外流。
+- 只读 STOP/去使能请求返回 `success=False`，说明没有发送硬件命令；
+  记录一条 `STOP_UNSUPPORTED`，不再污染轴异常状态，也不宣称硬件已停车。
+- 监控 Agent 退出仅关闭资源。监控界面退出不再向监控目标自动发送 STOP；
+  显式 STOP/STOP ALL 仍由 Agent 如实报告能力。控制目标退出与停车保护保持有效。
+- A 运行目录仍为 `/home/phi/robot_test_system`；B 的新增 CANopen 工程位于
+  `/home/phi/robot_test_system_git`，其控制配置保持 CAN 启用，原监控配置仍不加载 CAN。
+
+地面站重新启动 `./scripts/start_ground_dual.sh` 后显示 A 四路、B 三路 RGB。
+
 ## 2026-09-19：现场启动、视频分包与旧服务清理
 
 本节为最新状态。机器人启动控制配置现在只需：

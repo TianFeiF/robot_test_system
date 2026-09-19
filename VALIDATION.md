@@ -89,3 +89,16 @@ A/B ONLINE、Heartbeat 和 Diagnostics；按住 JOG 位置增长、松手停车�
   四轴均未使能，未执行运动或找零。截图时 A 不在线，未操作 A 的运行状态。
 - 当前 B 保留临时用户监控服务运行，未设置开机自启；SDK 实时调度权限警告仍存在，运动实时性未验收。
 - 结果：`logs/robot_b_deploy_validation/{rgb.json,final_status.json,dual_monitor.png}`。
+
+## 只读 STOP 修复与 A 四路 RGB（2026-09-20）
+
+- 25 项单元测试通过，覆盖监控 STOP/去使能拒绝、不写硬件、不锁存轴故障、保留已有故障、
+  监控退出资源释放以及控制模式停车失败仍尝试 disable。修复阶段 Mock P0 回归通过。
+- A/B 实机监控分别请求 STOP、SetBool(false)：均返回失败及明确的不支持原因，轴状态未被污染。
+  随后关闭两端 Agent，退出日志均为资源清理，整个本次会话 STOP_ERROR 数为 0。
+- A 45 秒收帧观察后继续验证服务：四路成功解码 235/226/235/234 帧，最长间隔 0.402 秒；
+  B 三路成功解码 245/236/245 帧，最长间隔 0.400 秒。解码错误和超过两秒间隔均为 0。
+- A 四个 usb_interface 不同，第二台 RealSense 仅使用 RGB 接口（当前 video14），不采集深度。
+- B 新增 CANopen 控制实现及节点参数保持不变。验证使用其原 site 配置（CAN disabled），
+  未启动 CAN 控制后端或测试支撑轴运动。
+- 结果：`logs/monitor_stop_fix_20260920/result.json`；对应机器人日志同名 session。
