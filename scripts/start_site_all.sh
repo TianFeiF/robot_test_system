@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start Robot A in MONITOR mode and Robot B in CONTROL mode (still DISARMED),
+# Start Robot A and Robot B in CONTROL mode (both still DISARMED),
 # then start the local dual-robot ground UI.
 # Closing the UI / Ctrl+C stops only remote sessions started by this launcher.
 set -euo pipefail
@@ -103,6 +103,10 @@ if pgrep -f '[r]obot_test_agent/agent' >/dev/null; then
   exit 1
 fi
 
+if [[ "$profile" == 'control' ]]; then
+  test -x "$root/.local-deps/bin/eyou_agent"
+fi
+
 if [[ "$rid" == 'b' && "$profile" == 'control' ]]; then
   test -x "$root/.local-deps/bin/eyou_canopen_agent"
   test -r "$root/.local-deps/eyou_canopen_sdk/lib/libeu_canopen.so"
@@ -132,10 +136,10 @@ REMOTE
 }
 
 echo "[site] ROS_DOMAIN_ID=$domain"
-echo '[site] Robot A: MONITOR only'
+echo '[site] Robot A: CONTROL backend, starts DISARMED; no motor is armed by this launcher'
 echo '[site] Robot B: CONTROL backend, starts DISARMED; no motor is armed by this launcher'
 
-start_robot "$ROBOT_A_HOST" "$ROBOT_A_ROOT" a monitor
+start_robot "$ROBOT_A_HOST" "$ROBOT_A_ROOT" a control
 start_robot "$ROBOT_B_HOST" "$ROBOT_B_ROOT" b control
 
 export ROS_DOMAIN_ID="$domain"
