@@ -36,6 +36,8 @@ class EyouNativeTests(unittest.TestCase):
                 epoch=time.monotonic_ns();send(f'ARM {epoch} {time.monotonic_ns()}')
                 send(f'CMD {epoch} 1 {time.monotonic_ns()} 0 50')
                 wait_for(lambda s:s['slaves'][0]['statusword']==0x27 and s['slaves'][0]['torque_raw']==50)
+                send(f'CMD {epoch} 2 {time.monotonic_ns()} 0 -50')
+                wait_for(lambda s:s['slaves'][0]['torque_raw']==-50)
                 state=wait_for(lambda s:not s['armed'])
                 self.assertGreater(state['watchdog_count'],0)
                 self.assertEqual(state['slaves'][0]['torque_raw'],0)

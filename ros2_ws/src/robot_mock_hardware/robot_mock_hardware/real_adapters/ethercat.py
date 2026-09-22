@@ -183,7 +183,7 @@ class EtherCATMotor(MotorAdapter):
         self.bus.command(self.axis, velocity)
 
     def set_torque(self, torque):
-        if not self.torque_mode or not math.isfinite(torque) or not 0 <= torque <= self.config['torque_raw_max']:
+        if not self.torque_mode or not math.isfinite(torque) or not self.config.get('torque_raw_min', 0) <= torque <= self.config['torque_raw_max']:
             raise ValueError('Torque outside axis limit')
         self.bus.command(self.axis, torque)
 

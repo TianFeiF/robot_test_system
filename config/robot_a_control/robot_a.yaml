@@ -18,7 +18,7 @@ axes:
     bus: ethercat
     slave_position: 0
     control_mode: torque
-    torque_raw_min: 0
+    torque_raw_min: -1000
     torque_raw_max: 1000
     jog_torque: 50
   clamp_right:
@@ -27,7 +27,7 @@ axes:
     bus: ethercat
     slave_position: 1
     control_mode: torque
-    torque_raw_min: 0
+    torque_raw_min: -1000
     torque_raw_max: 1000
     jog_torque: 50
   z_axis:

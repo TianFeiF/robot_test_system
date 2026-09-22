@@ -197,7 +197,7 @@ class GroundWindow(QMainWindow):
         for rid in self.configs:
             model = self.bridge.snapshot(rid)
             age = time.monotonic() - model.last_heartbeat if model.last_heartbeat else 0
-            self.labels[rid].setText(f'{rid} {"ONLINE" if model.online else "OFFLINE"} | {model.robot_state} | {model.control_mode}\nHeartbeat age {age:.1f}s | uptime {model.uptime:.1f}s')
+            self.labels[rid].setText(f'{rid} {"ONLINE" if model.online else "OFFLINE"} | {model.robot_state} | {model.control_mode}\nHeartbeat age {age:.1f}s | uptime {model.uptime:.1f}s | 时钟/传输时间差 {model.heartbeat_age_sec:+.3f}s')
             self.labels[rid].setStyleSheet('color:' + ('green' if model.online else 'red'))
             self.camera_panel.refresh(rid, model)
             table = self.tables[rid]

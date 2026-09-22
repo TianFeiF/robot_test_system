@@ -79,16 +79,27 @@ class RobotTestAgent(Node):
         response.message = self.controller.stop_message
         return response
 
+    def command_time_valid(self, stamp: int) -> bool:
+        age = (self.get_clock().now().nanoseconds - stamp) / 1e9
+        if stamp > self.command_epoch_ns and 0 <= age < self.controller.timeout:
+            return True
+        now = time.monotonic()
+        if now - getattr(self, '_last_command_time_warning', float('-inf')) >= 1.0:
+            self._last_command_time_warning = now
+            self.event('COMMAND_TIME_REJECTED',
+                       f'Command age={age:+.6f}s; requires 0 <= age < {self.controller.timeout}s '
+                       'and timestamp after ARM/STOP. Check clock synchronization on ground and robot.')
+        return False
+
     def on_jog(self, msg: JogCommand) -> None:
         stamp = msg.stamp.sec * 10**9 + msg.stamp.nanosec
-        age = (self.get_clock().now().nanoseconds - stamp) / 1e9
-        if stamp <= self.command_epoch_ns or not 0 <= age < self.controller.timeout:
+        if not self.command_time_valid(stamp):
             return
         try:
             self.controller.jog(msg.axis, msg.velocity, time.monotonic())
         except (RuntimeError, ValueError) as exc:
             # Rejected commands do not refresh the watchdog.
-            self.get_logger().debug(str(exc))
+            self.get_logger().warning(str(exc), throttle_duration_sec=1.0)
         except Exception as exc:
             self.controller.stop('JOG_ERROR')
             self.event('JOG_ERROR', str(exc))
@@ -108,13 +119,12 @@ class RobotTestAgent(Node):
 
     def on_torque(self, msg: TorqueCommand) -> None:
         stamp = msg.stamp.sec * 10**9 + msg.stamp.nanosec
-        age = (self.get_clock().now().nanoseconds - stamp) / 1e9
-        if stamp <= self.command_epoch_ns or not 0 <= age < self.controller.timeout:
+        if not self.command_time_valid(stamp):
             return
         try:
             self.controller.torque(msg.axis, msg.torque, time.monotonic())
         except (RuntimeError, ValueError) as exc:
-            self.get_logger().debug(str(exc))
+            self.get_logger().warning(str(exc), throttle_duration_sec=1.0)
         except Exception as exc:
             self.controller.stop('TORQUE_ERROR')
             self.event('TORQUE_ERROR', str(exc))

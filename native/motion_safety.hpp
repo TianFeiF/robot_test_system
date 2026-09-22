@@ -47,7 +47,7 @@ struct Safety {
         unsigned axis; uint64_t seq; double value;
         if (op != "CMD" || !(in >> seq >> stamp >> axis >> value) || (in >> trailing) || !armed ||
             e != epoch || seq <= sequence || axis >= 4 || stamp > now || now - stamp >= watchdog_ns || !std::isfinite(value)) return false;
-        if ((axis < 2 && (value < 0 || value > 1000)) || (axis == 2 && std::abs(value) > drive_max) ||
+        if ((axis < 2 && (value < -1000 || value > 1000)) || (axis == 2 && std::abs(value) > drive_max) ||
             (axis == 3 && ((!z_referenced && !allow_unreferenced_z) || std::abs(value) > z_max))) return false;
         if (axis == 3 && !requested[3]) z_started = now;
         sequence = seq; command[axis] = value; last_command[axis] = now; requested[axis] = true;
@@ -77,11 +77,15 @@ static int self_test() {
     auto require = [](bool condition) { if (!condition) { std::cerr << "Safety self-test failed\n"; std::exit(10); } };
     require(!s.input("CMD 1 1 1000000000 2 0.1", t));
     require(s.input("ARM 1 1000000000", t));
-    require(!s.input("CMD 1 1 1000000000 0 -1", t));
+    require(!s.input("CMD 1 1 1000000000 0 -1001", t));
     require(!s.input("CMD 1 1 1000000000 2 7", t));
     require(!s.input("CMD 1 1 1000000000 3 0.0001", t));
     require(s.input("CMD 1 1 1000000000 2 0.1", t));
     require(!s.input("CMD 1 1 1000000000 2 0.2", t));
+    require(!s.input("CMD 1 2 1000000000 0 1001", t));
+    require(s.input("CMD 1 2 1000000000 0 -1000", t));
+    require(s.input("CMD 1 3 1000000000 1 1000", t));
+    require(s.command[0] == -1000 && s.command[1] == 1000);
     s.check(t + watchdog_ns, 0, true, true); require(!s.armed && s.command[2] == 0);
     require(!s.input("CMD 1 2 1500000000 2 0.1", t + watchdog_ns));
     require(s.input("ARM 2 1500000000", t + watchdog_ns));

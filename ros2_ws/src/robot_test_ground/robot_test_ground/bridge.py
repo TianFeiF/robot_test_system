@@ -31,6 +31,7 @@ class RobotViewModel:
     control_mode: str = 'MONITOR'
     uptime: float = 0.0
     sequence: int = 0
+    heartbeat_age_sec: float = 0.0  # Includes transport delay; never used to rewrite command stamps.
     devices: Dict[str, dict] = field(default_factory=dict)
 
     @property
@@ -136,6 +137,8 @@ class GroundBridge(Node):
             model.control_mode = msg.control_mode
             model.uptime = msg.uptime
             model.sequence = msg.sequence
+            model.heartbeat_age_sec = (self.get_clock().now().nanoseconds -
+                                       (msg.stamp.sec * 10**9 + msg.stamp.nanosec)) / 1e9
         self.signals.changed.emit(rid)
 
     def on_diagnostics(self, rid, msg):
@@ -191,6 +194,12 @@ class GroundBridge(Node):
                 canceled = generation != self.generations[rid]
             if action in ('jog', 'torque', 'auto_keepalive', 'arm', 'start_auto'):
                 if canceled or (time.time_ns() - submitted) > 300_000_000:
+                    continue
+            if action in ('arm', 'start_auto'):
+                model = self.snapshot(rid)
+                if not model.online or not -0.1 <= model.heartbeat_age_sec <= 0.25:
+                    self.signals.result.emit(rid, action, token, False,
+                        f'控制未启动：机器人离线或时钟/通信延迟异常（心跳时间差 {model.heartbeat_age_sec:+.3f}s），请检查校时服务')
                     continue
             if action == 'event':
                 msg = TestEvent(stamp=self.get_clock().now().to_msg(), event_id=str(uuid.uuid4()), event_type=data['event_type'], description=data.get('description', ''))
