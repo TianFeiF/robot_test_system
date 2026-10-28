@@ -1,4 +1,4 @@
-// Eyou SDK 20260109: CSV for drive/Z, CST for clamps. No homing or fault reset.
+// Eyou SDK 20260109: CSV for drive/Z, CST for clamps. No fault reset.
 #include "eu_ethercat.h"
 #include "motion_safety.hpp"
 #include <fcntl.h>
@@ -8,11 +8,22 @@
 
 int main(int argc, char** argv) {
     if (argc == 2 && std::string(argv[1]) == "--self-test") return self_test();
-    if (argc < 3 || (std::string(argv[1]) != "--run" && std::string(argv[1]) != "--monitor")) return 2;
+    if (argc < 3 || argc > 4 || (std::string(argv[1]) != "--run" && std::string(argv[1]) != "--monitor")) return 2;
     const bool monitor = std::string(argv[1]) == "--monitor";
     Safety safety;
-    // Operator requested no homing. Unreferenced Z accepts only <=2 s manual bursts.
+    // Unreferenced Z accepts only a short bounded burst; explicit HOME is
+    // enabled by the control layer and temporarily bypasses the stored-zero
+    // software boundary while it measures the torque spike.
     safety.allow_unreferenced_z = true;
+    if (argc == 4) {
+        try {
+            size_t used = 0;
+            long long zero = std::stoll(argv[3], &used);
+            if (used != std::string(argv[3]).size() || zero < INT32_MIN || zero > INT32_MAX) return 2;
+            safety.z_zero = static_cast<int32_t>(zero);
+            safety.z_referenced = true;
+        } catch (...) { return 2; }
+    }
     signal(SIGINT, shutdown_signal); signal(SIGTERM, shutdown_signal); signal(SIGPIPE, SIG_IGN);
     prctl(PR_SET_PDEATHSIG, SIGTERM); if (getppid() == 1) return 3;
     int output = dup(STDOUT_FILENO);
@@ -69,7 +80,14 @@ int main(int argc, char** argv) {
         for(unsigned limit=0;limit<32;++limit) {
             auto end=pending.find('\n'); if(end==std::string::npos) break;
             auto line=pending.substr(0,end); pending.erase(0,end+1);
-            if(!monitor) safety.input(line,now);
+            if(!monitor) {
+                std::istringstream command(line);
+                std::string op; uint64_t epoch; int32_t zero_position;
+                if (command >> op >> epoch >> zero_position && op == "ZERO" && !(command >> op))
+                    safety.zero(epoch, zero_position);
+                else
+                    safety.input(line, now);
+            }
         }
         safety.check(monotonic_ns(),pos[3],healthy,timing_ok);
         if(!running) safety.stop();
@@ -98,7 +116,7 @@ int main(int argc, char** argv) {
             out << "{\"healthy\":"<<(healthy?"true":"false")<<",\"armed\":"<<(safety.armed?"true":"false")
                 <<",\"epoch\":"<<safety.epoch<<",\"sample_count\":"<<samples<<",\"watchdog_count\":"<<safety.watchdog_count
                 <<",\"timing_faults\":"<<timing_faults<<",\"api_error_count\":"<<api_errors
-                <<",\"z_referenced\":false,\"slaves\":[";
+                <<",\"z_referenced\":"<<(safety.z_referenced?"true":"false")<<",\"slaves\":[";
             for(unsigned i=0;i<4;++i) {
                 out<<(i?",":"")<<"{\"statusword\":"<<status[i]<<",\"position_raw\":"<<pos[i]
                    <<",\"velocity_raw\":"<<vel[i]<<",\"torque_raw\":"<<torque[i]

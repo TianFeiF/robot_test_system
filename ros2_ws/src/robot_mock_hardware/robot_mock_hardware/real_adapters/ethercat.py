@@ -31,6 +31,8 @@ class EtherCATBus(DeviceAdapter):
             args = [self.config['executable'], '--monitor' if self.config.get('read_only') else '--run']
             if self.config.get('backend') == 'eyou':
                 args.append(self.config.get('interface', 'enp2s0'))
+                if self.config.get('z_zero_counts') is not None:
+                    args.append(str(int(self.config['z_zero_counts'])))
             elif self.config.get('z_zero_counts') is not None:
                 args.append(str(int(self.config['z_zero_counts'])))
             log_path = self.config.get('log_file')
@@ -103,6 +105,12 @@ class EtherCATBus(DeviceAdapter):
             self.sequence += 1
             self._send(f'CMD {self.epoch} {self.sequence} {time.monotonic_ns()} {axis} {value:.12g}')
 
+    def begin_z_homing(self):
+        with self.condition:
+            if not self.arm_requested or not self._fresh():
+                raise RuntimeError('Z homing requires an armed, fresh EtherCAT session')
+            self._send(f'HOME {self.epoch}')
+
     def stop(self):
         with self.condition:
             if self.config.get('read_only'):
@@ -122,6 +130,32 @@ class EtherCATBus(DeviceAdapter):
                     return
                 self.condition.wait(timeout=max(0, deadline - time.monotonic()))
             raise RuntimeError('EtherCAT disable acknowledgment timeout; hardware stop not confirmed')
+
+    def zero_z(self):
+        with self.condition:
+            if self.config.get('read_only'):
+                raise RuntimeError('Read-only EtherCAT session cannot zero Z')
+            if not self._fresh() or self.arm_requested:
+                raise RuntimeError('Z zero requires fresh feedback while disarmed')
+            raw = int(self.snapshot['slaves'][3]['position_raw'])
+            return self.set_z_reference(raw)
+
+    def set_z_reference(self, raw):
+        with self.condition:
+            if self.config.get('read_only') or self.arm_requested:
+                raise RuntimeError('Z zero requires a writable, disarmed EtherCAT session')
+            if not self._fresh():
+                raise RuntimeError('Z zero requires fresh feedback')
+            raw = int(raw)
+            epoch = time.monotonic_ns()
+            self._send(f'ZERO {epoch} {raw}')
+            deadline = time.monotonic() + .5
+            while time.monotonic() < deadline:
+                if self._fresh() and self.snapshot.get('z_referenced'):
+                    self.config['z_zero_counts'] = raw
+                    return raw
+                self.condition.wait(timeout=max(0, deadline - time.monotonic()))
+            raise RuntimeError('EtherCAT zero acknowledgment timeout')
 
     def get_status(self):
         with self.condition:
@@ -155,6 +189,9 @@ class EtherCATMotor(MotorAdapter):
         self.config = config
         self.axis = int(config['slave_position'])
         self.torque_mode = config.get('control_mode') == 'torque'
+        self.torque_sign = int(config.get('torque_sign', 1))
+        if self.torque_sign not in (-1, 1):
+            raise ValueError('torque_sign must be +1 or -1')
         counts = float(config.get('encoder_counts_per_rev', 65536)) * float(config.get('gear_ratio', 1))
         self.scale = config['lead_m'] / counts if 'lead_m' in config else 2 * math.pi / counts
 
@@ -185,7 +222,10 @@ class EtherCATMotor(MotorAdapter):
     def set_torque(self, torque):
         if not self.torque_mode or not math.isfinite(torque) or not self.config.get('torque_raw_min', 0) <= torque <= self.config['torque_raw_max']:
             raise ValueError('Torque outside axis limit')
-        self.bus.command(self.axis, torque)
+        # Logical torque is shared by the UI and automatic test.  Apply the
+        # installation sign at the EtherCAT boundary so mirrored clamps can
+        # receive opposite physical torque while retaining one command scale.
+        self.bus.command(self.axis, torque * self.torque_sign)
 
     def get_status(self):
         status = self.bus.get_status()
@@ -205,6 +245,11 @@ class EtherCATMotor(MotorAdapter):
 
     def get_position(self):
         return self.get_status().values.get('position', float('nan'))
+
+    def zero_reference(self):
+        if self.axis != 3:
+            raise ValueError('Only z_axis can be zeroed')
+        return self.bus.zero_z()
 
     def get_velocity(self):
         return self.get_status().values.get('velocity', float('nan'))

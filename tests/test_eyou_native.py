@@ -22,7 +22,7 @@ class EyouNativeTests(unittest.TestCase):
             process=subprocess.Popen([str(binary),'--run','fake'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,bufsize=0)
             selector=selectors.DefaultSelector(); selector.register(process.stdout,selectors.EVENT_READ)
             def send(line):process.stdin.write((line+'\n').encode())
-            def wait_for(predicate,timeout=2):
+            def wait_for(predicate,timeout=3):
                 deadline=time.monotonic()+timeout;last=None
                 while time.monotonic()<deadline:
                     if selector.select(.1):

@@ -81,7 +81,7 @@ class GroundBridge(Node):
             self.torque_publishers[rid] = self.create_publisher(TorqueCommand, f'/{rid}/torque_command', QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT))
             self.event_publishers[rid] = self.create_publisher(TestEvent, f'/{rid}/test_event', 50)
             self.auto_publishers[rid] = self.create_publisher(Time, f'/{rid}/auto_keepalive', QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT))
-            self.service_clients[rid] = {'stop': self.create_client(Trigger, f'/{rid}/stop'), 'arm': self.create_client(SetBool, f'/{rid}/arm')}
+            self.service_clients[rid] = {'stop': self.create_client(Trigger, f'/{rid}/stop'), 'arm': self.create_client(SetBool, f'/{rid}/arm'), 'zero_z': self.create_client(Trigger, f'/{rid}/zero_z'), 'home_z': self.create_client(Trigger, f'/{rid}/home_z')}
             self.service_clients[rid].update({
                 'start_auto': self.create_client(Trigger, f'/{rid}/start_auto'),
                 'stop_auto': self.create_client(Trigger, f'/{rid}/stop_auto'),
@@ -192,7 +192,7 @@ class GroundBridge(Node):
             submitted = data.pop('_submitted_ns')
             with self.command_lock:
                 canceled = generation != self.generations[rid]
-            if action in ('jog', 'torque', 'auto_keepalive', 'arm', 'start_auto'):
+            if action in ('jog', 'torque', 'auto_keepalive', 'arm', 'start_auto', 'zero_z', 'home_z'):
                 if canceled or (time.time_ns() - submitted) > 300_000_000:
                     continue
             if action in ('arm', 'start_auto'):

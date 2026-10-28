@@ -139,9 +139,10 @@ try:
     # Cut transport stream without delivering STOP; agent watchdog must stop itself.
     window.active_jog = None
     began = time.monotonic()
-    until(lambda: value('robot_a') == 0, 1.2)
+    watchdog_sec = configs['robot_a']['test']['watchdog_timeout_ms'] / 1000.0
+    until(lambda: value('robot_a') == 0, watchdog_sec + 0.7)
     watchdog_observed = time.monotonic() - began
-    check(f'500ms watchdog: stop observed in {watchdog_observed:.3f}s including telemetry delay', watchdog_observed < 0.85)
+    check(f'{watchdog_sec:g}s watchdog: stop observed in {watchdog_observed:.3f}s including telemetry delay', watchdog_observed < watchdog_sec + 0.35)
     for rid in configs:
         bridge.submit(rid, 'arm')
     pump(0.3)

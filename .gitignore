@@ -8,3 +8,10 @@ __pycache__/
 .pytest_cache/
 
 .local-deps/
+
+# Local build output and field archives (vendor SDK redistribution not verified).
+/build/
+/install/
+/log/
+/artifacts/
+/control_reference_field_20261028/

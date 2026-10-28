@@ -67,3 +67,11 @@ class ControlRegressionTests(unittest.TestCase):
             'slave_position': 0, 'control_mode': 'torque', 'torque_raw_max': 1000})
         with self.assertRaises(ValueError):
             motor.set_torque(-1)
+
+    def test_ethercat_torque_sign_maps_mirrored_clamp(self):
+        bus = SimpleNamespace(command=Mock())
+        motor = EtherCATMotor(bus, {'slave_position': 0, 'control_mode': 'torque',
+                                   'torque_raw_min': -1000, 'torque_raw_max': 1000,
+                                   'torque_sign': -1})
+        motor.set_torque(600)
+        bus.command.assert_called_once_with(0, -600)

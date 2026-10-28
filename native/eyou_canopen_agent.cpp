@@ -435,7 +435,7 @@ private:
                 static_cast<int>(
                     std::llround(value));
 
-            // Native 层再做一次 ±1000 上限保护
+            // Native 层再按配置的 max_abs_torque 做一次上限保护
             if (std::abs(torque) >
                 max_abs_torque_)
             {
@@ -878,7 +878,7 @@ int main(
         if (dev_index_i < 0 ||
             dev_index_i > 255 ||
             watchdog_ms <= 0 ||
-            watchdog_ms > 500 ||
+            watchdog_ms > 2000 ||
             torque_slope_i <= 0 ||
             max_abs_torque <= 0 ||
             max_abs_torque > 32767)

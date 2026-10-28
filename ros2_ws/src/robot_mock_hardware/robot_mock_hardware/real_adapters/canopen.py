@@ -98,7 +98,7 @@ class CANopenBus(DeviceAdapter):
             max_abs_torque = int(
                 self.config.get(
                     "max_abs_torque",
-                    1000,
+                    600,
                 )
             )
 
@@ -899,14 +899,14 @@ class CANopenMotor(MotorAdapter):
         minimum = float(
             self.config.get(
                 "torque_raw_min",
-                -1000,
+                -600,
             )
         )
 
         maximum = float(
             self.config.get(
                 "torque_raw_max",
-                1000,
+                600,
             )
         )
 

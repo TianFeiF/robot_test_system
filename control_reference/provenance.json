@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-10-28T01:56:04.473499+00:00",
+  "source_root": "/home/sgcc/robot_test_system",
+  "git_head": "dc31455c548ab78a1f760d2074d362fa67e6fc51",
+  "git_branch": "manual/robot-a-control",
+  "source": "Local working tree including uncommitted modifications; not just HEAD",
+  "remote_verification": {
+    "robot_a": "SSH No route to host; latest remote files/SDK not collected",
+    "robot_b": "SSH No route to host; latest remote files/SDK not collected"
+  },
+  "excluded": [
+    ".git",
+    ".venv",
+    ".local-deps",
+    "logs",
+    "build",
+    "install",
+    "log",
+    "ros2_ws/build",
+    "ros2_ws/install",
+    "ros2_ws/log"
+  ],
+  "archive_scope": "Source/config/scripts/tests/documentation; not a complete offline runtime or production console"
+}

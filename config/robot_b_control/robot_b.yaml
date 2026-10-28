@@ -18,20 +18,22 @@ axes:
     bus: ethercat
     slave_position: 0
     control_mode: torque
-    torque_raw_min: -1000
-    torque_raw_max: 1000
-    jog_torque: 50
+    torque_raw_min: -400
+    torque_raw_max: 400
+    jog_torque: 400
+    torque_sign: -1
   clamp_right:
     max_velocity: 0.2
     jog_velocity: 0.1
     bus: ethercat
     slave_position: 1
     control_mode: torque
-    torque_raw_min: -1000
-    torque_raw_max: 1000
-    jog_torque: 50
+    torque_raw_min: -400
+    torque_raw_max: 400
+    jog_torque: 400
+    torque_sign: 1
   z_axis:
-    max_velocity: 0.00019801980198019803
+    max_velocity: 0.01
     jog_velocity: 5.0e-05
     bus: ethercat
     slave_position: 3
@@ -41,35 +43,45 @@ axes:
     position_unit: m
     velocity_unit: m/s
     requires_zero: false
-    position_min: 0
-    position_max: 0.3
+    position_min: -0.02
+    position_max: 0.5
   support_left:
     bus: canopen
     node_id: 1
     control_mode: torque
-    torque_raw_min: -1000
-    torque_raw_max: 1000
-    jog_torque: 50
+    torque_raw_min: -800
+    torque_raw_max: 800
+    jog_torque: 800
     torque_sign: 1
   support_right:
     bus: canopen
     node_id: 2
     control_mode: torque
-    torque_raw_min: -1000
-    torque_raw_max: 1000
-    jog_torque: 50
+    torque_raw_min: -800
+    torque_raw_max: 800
+    jog_torque: 800
     torque_sign: 1
 hardware:
   ethercat:
     enabled: true
     backend: eyou
-    executable: /home/phi/robot_test_system/.local-deps/bin/eyou_agent
+    executable: /home/phi/robot_test_system_git/.local-deps/bin/eyou_agent.zero-fix
     interface: enp2s0
-    z_zero_counts: null
+    z_zero_counts: -13988040
     allow_unreferenced_z: false
     read_only: false
     log_file: /home/phi/robot_test_system/logs/eyou_sdk.log
     stop_policy: zero_and_disable
+    z_homing:
+      direction: -1
+      approach_velocity: 0.001
+      backoff_velocity: 0.001
+      backoff_sec: 0.5
+      repetitions: 3
+      baseline_samples: 20
+      torque_delta_raw: 500
+      torque_ratio: 2.0
+      approach_timeout_sec: 600.0
   lidar:
     enabled: true
     backend: livox
@@ -87,21 +99,42 @@ hardware:
     bitrate: 1000000
     executable: /home/phi/robot_test_system_git/.local-deps/bin/eyou_canopen_agent
     sdk_lib: /home/phi/robot_test_system_git/.local-deps/eyou_canopen_sdk/lib
-    max_abs_torque: 1000
+    max_abs_torque: 800
     torque_slope: 500
-    watchdog_ms: 500
+    watchdog_ms: 2000
     log_file: /home/phi/robot_test_system_git/logs/eyou_canopen_agent.log
 test:
-  watchdog_timeout_ms: 500
+  watchdog_timeout_ms: 2000
   heartbeat_hz: 1.0
   diagnostics_hz: 5.0
   auto_cycle:
-    enabled: false
+    enabled: true
     axis: drive
     positive_target: 1.0
     negative_target: -1.0
     velocity: 0.1
     dwell_sec: 1.0
+    axes:
+      drive:
+        enabled: false
+        velocity: 0.17453292519943295
+        reverse_period_sec: 5.0
+      clamp_left:
+        torque_raw: 400
+        period_sec: 10.0
+      clamp_right:
+        torque_raw: 400
+        period_sec: 10.0
+      z_axis:
+        position_min_m: 0.0
+        position_max_m: 0.02
+        velocity: 0.01
+      support_left:
+        torque_raw: 800
+        period_sec: 10.0
+      support_right:
+        torque_raw: 800
+        period_sec: 10.0
 cameras:
   camera_1:
     enabled: true

@@ -19,8 +19,8 @@ axes:
     slave_position: 0
     control_mode: torque
     torque_raw_min: 0
-    torque_raw_max: 1000
-    jog_torque: 50
+    torque_raw_max: 400
+    jog_torque: 400
   clamp_right:
     max_velocity: 0.2
     jog_velocity: 0.1
@@ -28,10 +28,10 @@ axes:
     slave_position: 1
     control_mode: torque
     torque_raw_min: 0
-    torque_raw_max: 1000
-    jog_torque: 50
+    torque_raw_max: 400
+    jog_torque: 400
   z_axis:
-    max_velocity: 0.00019801980198019803
+    max_velocity: 0.01
     jog_velocity: 5.0e-05
     bus: ethercat
     slave_position: 3
@@ -41,8 +41,8 @@ axes:
     position_unit: m
     velocity_unit: m/s
     requires_zero: false
-    position_min: 0
-    position_max: 0.3
+    position_min: -0.02
+    position_max: 0.5
 hardware:
   ethercat:
     enabled: true

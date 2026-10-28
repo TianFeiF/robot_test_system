@@ -1,5 +1,8 @@
 # Robot Hardware Test System v0.1
 
+测试完成后的驱动与控制台开发资料已独立归档到 [control_reference](control_reference/README.md)，包含源码快照、设备参数、ROS 接口、部署依赖和迁移方案。现场 SDK 与最新标定仍以机器人端为准。
+现场补采结果与本地归档位置见 [现场资料归档说明](docs/现场资料归档说明.md)。Robot A/B 的厂商 SDK、二进制及现场标定快照保留在本地，未纳入 Git；源码参考包 `control_reference` 随仓库保存。
+
 三台机器开机联网后，在地面站工程目录执行 `./scripts/start_site_all.sh`，即可通过免密 SSH
 启动 A/B 真实控制后端并打开双机地面站。关闭该地面站或在启动终端按 Ctrl+C，会停止本脚本启动的
 两端控制会话。启动脚本本身不会 ARM 或发送运动指令；A/B 都由地面站显式 ARM 后才允许运动。
@@ -91,15 +94,15 @@ source install/setup.bash
 
 1. 等待 A/B 均显示 ONLINE，设备状态绿色。Heartbeat 为 1 Hz；Diagnostics 默认 5 Hz；Heartbeat 接收间隔达到 3 秒显示 OFFLINE。离线设备状态标为 OFFLINE，位置/计数为最后接收的旧数据，重连无需重启地面站。
 2. 选择机器人和轴，按住 JOG + / −。地面站先请求 arm，再以 10 Hz 发送指令，表格中的 position 连续变化。速度和上限来自 YAML。
-3. 松手立即发送 STOP。窗口失焦也会停止当前 JOG。若进程或网络断流，Agent 自己的 10 ms 检查循环在最后有效指令 500 ms 后停车并解除使能。
+3. 松手立即发送 STOP。窗口失焦也会停止当前 JOG。若进程或网络断流，Agent 自己的 10 ms 检查循环在最后有效指令 2 s 后停车并解除使能。
 4. STOP 停止选定机器人的所有电机和自动循环；STOP ALL 对 A/B 分别调用 STOP。检查 velocity 为 0、enabled=False、auto_state=IDLE。STOP 后持续到达的 JOG 不会恢复运动，必须重新按下 JOG 或明确启动 Auto。
-5. START AUTO TEST 使 drive 按 YAML 目标往复：默认 +1.0、停 1 秒、−1.0、停 1 秒，再循环，速度 0.1。STOP AUTO TEST、STOP、STOP ALL 都能中断。自动运动也有 10 Hz 地面站保活，保活丢失 500 ms 停车。界面失焦不会取消已启动的 Auto；关闭界面会 STOP ALL。
+5. START AUTO TEST 同时运行 YAML 中所有可控轴：A/B 夹持力矩轴以 ±400、B 支撑 CANopen 轴以 ±800，每 5 秒换向；drive 不参与自动循环（仍可手动 JOG）；Robot A 的 Z 轴因同步带问题暂停自动循环；Robot B 的 Z 轴以 0.01 m/s 在回零点到 20 mm 区间往返。Z 的机械安全范围为 −20 mm 到 500 mm。左、右夹持轴按安装方向映射为相反物理力矩。STOP AUTO TEST、STOP、STOP ALL 都能中断。自动运动也有 10 Hz 地面站保活，保活丢失 2 s 停车。界面失焦不会取消已启动的 Auto；关闭界面会 STOP ALL。
 6. MOCK FAULT 选择设备，再 INJECT / RECOVER：camera_1 等各路相机掉线、ethercat 错误、drive/其他轴故障、heartbeat 丢失、rs485 超时、canopen 离线、network 警告。恢复不自动重新使能运动。运动总线或电机故障立即停止所有电机；可选相机故障不阻塞其他模块。
 7. 关闭 A Agent，约 3 秒后仅 A OFFLINE；重新运行 `start_robot_a.sh`，A 自动恢复 ONLINE。Heartbeat 判定依据本机 monotonic 接收时间。
 8. 输入事件描述，点击 EQUIPOTENTIAL CONTACT 等标记。Ground 先落盘，再向 A/B 各自 namespace 发布同一事件 ID、UTC 时间戳和描述。在线三端日志可直接对齐。
 9. Robot A 默认 5 路相机、Robot B 3 路，各路独立显示画面、帧号和时间，约 5 FPS。默认全屏，1920×1080（100% 缩放）下全部相机横排同时可见；F11 切换全屏，Esc 回到窗口。采集线程与运动 executor 隔离，地面站只存最新帧；ROS 回调不操作 QWidget。离线或两秒无新帧会清空预览，避免把旧画面误作实时画面。
 
-**软件 STOP 不是硬件急停。** Python/ROS 2 的 500 ms Watchdog 是软件时限，调度和通信有抖动；进程卡死、OS 故障和物理断电保护必须由真实硬件驱动器/安全回路完成。界面 STOP 服务失败或超时会写到日志区；失联机器人的停车依赖其本地 Watchdog，不能把发送 STOP 等同于硬件停车已确认。
+**软件 STOP 不是硬件急停。** Python/ROS 2 的 2 s Watchdog 是软件时限，调度和通信有抖动；进程卡死、OS 故障和物理断电保护必须由真实硬件驱动器/安全回路完成。界面 STOP 服务失败或超时会写到日志区；失联机器人的停车依赖其本地 Watchdog，不能把发送 STOP 等同于硬件停车已确认。
 
 ## 日志
 
@@ -143,7 +146,9 @@ cameras:
 | jog_command | robot_test_msgs/JogCommand | 时间戳、轴、速度；best effort / depth 1 |
 | arm | std_srvs/SetBool | 显式使能 / 停车解除使能 |
 | stop / stop_auto | std_srvs/Trigger | 停止全部轴及 Auto |
-| start_auto | std_srvs/Trigger | 启动 YAML 定义的 drive 往复 |
+| start_auto | std_srvs/Trigger | 启动 YAML 定义的全关节自动循环 |
+| home_z | std_srvs/Trigger | Z 轴力矩突变回零，三次碰撞位置取平均 |
+| zero_z | std_srvs/Trigger | 停止状态下将当前位置直接设为 Z 零点 |
 | auto_keepalive | builtin_interfaces/Time | 自动模式保活时间戳 |
 | inject_fault | robot_test_msgs/InjectFault | device、fault、active |
 | test_event | robot_test_msgs/TestEvent | 同一时间戳、事件 ID、类型、描述 |

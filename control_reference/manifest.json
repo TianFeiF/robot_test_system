@@ -1,0 +1,844 @@
+{
+  "version": 1,
+  "hash": "sha256",
+  "files": [
+    {
+      "path": "README.md",
+      "type": "file",
+      "bytes": 3534,
+      "sha256": "f5a706dcb8be0d1c2c3047372313796115efd2272e13b42637d582b4754d13e4"
+    },
+    {
+      "path": "baseline/.gitignore",
+      "type": "file",
+      "bytes": 106,
+      "sha256": "17c6d6fceb57f8a5353242b864583e785fe7c5325ab6e0a7e2ad3e77dad69b16"
+    },
+    {
+      "path": "baseline/README.md",
+      "type": "file",
+      "bytes": 14996,
+      "sha256": "a8f0b34bc88152ad19664d82f2c0b642dacaade6eab731701609beab90814ca1"
+    },
+    {
+      "path": "baseline/VALIDATION.md",
+      "type": "file",
+      "bytes": 10307,
+      "sha256": "32496033672356a352c2f5c67890541f0b271c4e5062b98f9bbe932517d76729"
+    },
+    {
+      "path": "baseline/config/dual_robot_site/robot_a.yaml",
+      "type": "symlink",
+      "target": "../robot_a_control/robot_a.yaml"
+    },
+    {
+      "path": "baseline/config/dual_robot_site/robot_b.yaml",
+      "type": "symlink",
+      "target": "../robot_b_control/robot_b.yaml"
+    },
+    {
+      "path": "baseline/config/fastdds_site.xml",
+      "type": "file",
+      "bytes": 939,
+      "sha256": "b55660199b65e1df257b7eb3833d41031921b3f729e666c4be0f9955e87f74f7"
+    },
+    {
+      "path": "baseline/config/robot_a_control/robot_a.yaml",
+      "type": "file",
+      "bytes": 3823,
+      "sha256": "f7f087fe0714d568d8fc1c9857cef9489e4b95d3bb0248a9ff08c1fbe834baa7"
+    },
+    {
+      "path": "baseline/config/robot_a_site/mid360s.json",
+      "type": "file",
+      "bytes": 504,
+      "sha256": "22afa26463739514d38f4c7a19d1fdc384fd06e5ddbcff0a2bf384fe0d153117"
+    },
+    {
+      "path": "baseline/config/robot_a_site/robot_a.yaml",
+      "type": "file",
+      "bytes": 3142,
+      "sha256": "d612b4fe9f7603fe43202bf57ebea393fbc2edf5c69fd602841927475eb49e31"
+    },
+    {
+      "path": "baseline/config/robot_b_control/robot_b.yaml",
+      "type": "file",
+      "bytes": 4119,
+      "sha256": "6e05879c973997e972093be1e9c12445cfa357967b235872beb5e4a12c92dd64"
+    },
+    {
+      "path": "baseline/config/robot_b_site/mid360s.json",
+      "type": "file",
+      "bytes": 506,
+      "sha256": "9351d09ec70e9cecbde4226ad9cbb6a22c5d33815ddd8a50db5880a978441194"
+    },
+    {
+      "path": "baseline/config/robot_b_site/robot_b.yaml",
+      "type": "file",
+      "bytes": 2623,
+      "sha256": "5c7887ef2de830877509232b5eecf13c05ed1a5278072bf381197f7ac3a8812f"
+    },
+    {
+      "path": "baseline/docs/Codex 开发提示词：双机器人硬件测试 Demo.md",
+      "type": "file",
+      "bytes": 26570,
+      "sha256": "16e3099839146a9c3c9c7d41ea9e098311a0357db7d38d6c9321af4598a5a315"
+    },
+    {
+      "path": "baseline/docs/RobotA远程接入记录.md",
+      "type": "file",
+      "bytes": 15269,
+      "sha256": "0d35ae6210046c462a711c3ea25e3340725a579cba1c89807f18299ee77fcc24"
+    },
+    {
+      "path": "baseline/docs/RobotB远程接入记录.md",
+      "type": "file",
+      "bytes": 5409,
+      "sha256": "c22ae52511990e525ecdd77ecb532b9c808f156926c19904ffd7ff06c181efe0"
+    },
+    {
+      "path": "baseline/docs/Z轴回零测试说明.md",
+      "type": "file",
+      "bytes": 3884,
+      "sha256": "0fd333fe27cd8c1576afd6b3a83876bbcd586accffa93958ca8d6bd1ebf0297d"
+    },
+    {
+      "path": "baseline/docs/reference/原开发提示词_完成标记前.md",
+      "type": "file",
+      "bytes": 24965,
+      "sha256": "3aa3cbc12829075a8daa1ad0a85db26b13a8c5995623e2de57e47361468c7704"
+    },
+    {
+      "path": "baseline/docs/使用指南.md",
+      "type": "file",
+      "bytes": 7836,
+      "sha256": "6e58753a674be8491417dbe67048e0c09608606eca21bf67911caaf43dd1f076"
+    },
+    {
+      "path": "baseline/docs/后续配置指南.md",
+      "type": "file",
+      "bytes": 9212,
+      "sha256": "c644849143a56d7c893e04c1627e6b8a8f2ddb57154238ce68a66e4744ca6d8d"
+    },
+    {
+      "path": "baseline/docs/控制与校时修复说明.md",
+      "type": "file",
+      "bytes": 3615,
+      "sha256": "a3c260d1cda246441c4afa6e5dc25f405230f8f188f1e7747395c53f49959f18"
+    },
+    {
+      "path": "baseline/docs/无线网桥与雷达预算.md",
+      "type": "file",
+      "bytes": 4854,
+      "sha256": "2b40a7d517e346aab44085f556d0dfd4f1a4163e4ae1b4a9c80defd875a9fce0"
+    },
+    {
+      "path": "baseline/docs/笔记本摄像头测试.md",
+      "type": "file",
+      "bytes": 4549,
+      "sha256": "ac33e156a822959a9106776da42ffdeca14c580c6bc8313dda7f440bce13a6c7"
+    },
+    {
+      "path": "baseline/native/ethercat_agent.cpp",
+      "type": "file",
+      "bytes": 7637,
+      "sha256": "856dfa0319f514fe0d0098fa6577c6c84448805acd6727eb1c4c54ab3755a9f9"
+    },
+    {
+      "path": "baseline/native/eyou_agent.cpp",
+      "type": "file",
+      "bytes": 6743,
+      "sha256": "35defb3ddcc48e835a941251a2487c73c681f7649f4563b0fd4f0a3b34a3c39d"
+    },
+    {
+      "path": "baseline/native/eyou_canopen_agent.cpp",
+      "type": "file",
+      "bytes": 22551,
+      "sha256": "c1a0b7ef48be7d1685f6fc6c97832d81200cc4770d1d8b7cc9c885b5270a8d58"
+    },
+    {
+      "path": "baseline/native/motion_safety.hpp",
+      "type": "file",
+      "bytes": 8640,
+      "sha256": "1c03cd79644a82c58a6f7f2eaabb1e79432d714c273623556d8777c4baee96df"
+    },
+    {
+      "path": "baseline/requirements.txt",
+      "type": "file",
+      "bytes": 71,
+      "sha256": "8ebd77ccb09b637cadf515cb0a2eadd90d43af3f8b25bb156c3244005c5eddbd"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/package.xml",
+      "type": "file",
+      "bytes": 476,
+      "sha256": "9b94703e29e8a25bbe7238bcd6d79159bf28a965b02344c306debb18e25f6d09"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/resource/robot_mock_hardware",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/__init__.py",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/camera.py",
+      "type": "file",
+      "bytes": 3349,
+      "sha256": "fddd73b9db281aa94bc33b5f4cb8367cffb763527a5cbb217fb6a343f52d7853"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/devices.py",
+      "type": "file",
+      "bytes": 1893,
+      "sha256": "61fe1a5d92c0c2b470a2b1e1728bd86b57fbf9abc50b0cc27b00e334be831684"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/factory.py",
+      "type": "file",
+      "bytes": 6640,
+      "sha256": "c3463395c2ec27338d1596a1a5de992fa55fdefcee9f74bf0b92c2be42ca897a"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/lidar.py",
+      "type": "file",
+      "bytes": 2891,
+      "sha256": "e4fbe014ea045ce9f45e170508c625163ef73a7d76b8d4d0944587d20f97c943"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/motor.py",
+      "type": "file",
+      "bytes": 2173,
+      "sha256": "5064ff9794c8c52d884adfa184e9270819b322bb68c4ed7fa49a24e90b8594f3"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/real_adapters/__init__.py",
+      "type": "file",
+      "bytes": 1937,
+      "sha256": "71b1ac7fb651c1b03055ce064b2bc407f3380db413d22c707bb1ce7b86da3bd9"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/real_adapters/canopen.py",
+      "type": "file",
+      "bytes": 25929,
+      "sha256": "c5b07ef35c824a0c0c23e4aef7ccc75f41968d1ade0b946dd66b9dc5906cfd17"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/real_adapters/ethercat.py",
+      "type": "file",
+      "bytes": 11984,
+      "sha256": "85dda64d98253dd06b829a7654536ec33736ee9f4494a5da9232909c39533d52"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/real_adapters/livox.py",
+      "type": "file",
+      "bytes": 2391,
+      "sha256": "d62b006b25462c045bfb28428bb0e7baacc21f1f978989212bad9c0622b41bee"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/real_adapters/realsense_depth.py",
+      "type": "file",
+      "bytes": 2361,
+      "sha256": "7272e5600892b0c15ee3624c467d0553791250404f4526799015af6f28cc741d"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/real_adapters/rgb_devices.py",
+      "type": "file",
+      "bytes": 2773,
+      "sha256": "726551cd29854c8571590d7698eab9f1ada19fb6575c25b2d7a3462824d64b40"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/real_adapters/telemetry.py",
+      "type": "file",
+      "bytes": 8023,
+      "sha256": "26b3803b40650948c43b34a25949734576de16c96817450d831b04b55df2ac96"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/robot_mock_hardware/real_adapters/uvc_camera.py",
+      "type": "file",
+      "bytes": 6689,
+      "sha256": "82bf5b4ff6db60d085d7a51cc6abd3807f1f02f504d65f90831fb1dfa2c07345"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/setup.cfg",
+      "type": "file",
+      "bytes": 107,
+      "sha256": "0b66c7116659596750f5a8d46c9d7ee780007798eb4b165b7b4ecd85281c4fe3"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_mock_hardware/setup.py",
+      "type": "file",
+      "bytes": 497,
+      "sha256": "35c7189711def2e6667708be7415f17123748cccfd01966dcd25aacf0e8f66ab"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_agent/package.xml",
+      "type": "file",
+      "bytes": 711,
+      "sha256": "814dcfe0f9f9b4c66330f60a9ad8be7ca547f9946eed2c9ee504926ec6c97026"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_agent/resource/robot_test_agent",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_agent/robot_test_agent/__init__.py",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_agent/robot_test_agent/camera_stream.py",
+      "type": "file",
+      "bytes": 2981,
+      "sha256": "270e70b7408eee1f3533659941e11cf68c75db04d66a01844cb02c11b3fe8bae"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_agent/robot_test_agent/extensions.py",
+      "type": "file",
+      "bytes": 3377,
+      "sha256": "4fa37d614434c3a2b9bded557886382e69fb78a20250bf879ab4dbe38c070cba"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_agent/robot_test_agent/node.py",
+      "type": "file",
+      "bytes": 16867,
+      "sha256": "ac84d27bba27449f4b29dc6577ff3de07f9eef4f6371764d0b2b0a9d6e8b72eb"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_agent/setup.cfg",
+      "type": "file",
+      "bytes": 101,
+      "sha256": "717ec21ffc503adcf0c73f8f9344fd28e5ac5507ab984263431aa72fc4911398"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_agent/setup.py",
+      "type": "file",
+      "bytes": 508,
+      "sha256": "bed7957b7814bc13001dccb3fa92f298b82664824e735a8f24e6470dc53f0221"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_bringup/config/robot_a.yaml",
+      "type": "file",
+      "bytes": 1360,
+      "sha256": "aeb448a9def9b000ecfe9ffc74b889501cbb4a9c5b28734c37e51afe01fcbe61"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_bringup/config/robot_b.yaml",
+      "type": "file",
+      "bytes": 1299,
+      "sha256": "82aa8f834865c0e01a274d97cb7c5643558390126118f63ac202ec7d8caf54db"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_bringup/launch/mock_full_system.launch.py",
+      "type": "file",
+      "bytes": 730,
+      "sha256": "4c9b6bfb64b2df237ac612707e750d7dae6e0075b86f9ff260be3f1a822b6320"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_bringup/package.xml",
+      "type": "file",
+      "bytes": 510,
+      "sha256": "77c43c8cb725b25bf48b714e1be73568ceade19dc64280a2e67c05e76d7099d0"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_bringup/resource/robot_test_bringup",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_bringup/robot_test_bringup/__init__.py",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_bringup/setup.cfg",
+      "type": "file",
+      "bytes": 105,
+      "sha256": "b391c64f81f337087cd9c4e8a8a67f5d41b2eaf70b586440d194aa5ba44c6d54"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_bringup/setup.py",
+      "type": "file",
+      "bytes": 484,
+      "sha256": "59a73221d4bdebaf6334667846602c63f37b0b2170be467386ba6ea522dbff51"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/package.xml",
+      "type": "file",
+      "bytes": 388,
+      "sha256": "dc84771491a9b720f81c1bb3f439a07cbe624f6d5b20ee67bcb8ac0e986f47f4"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/resource/robot_test_core",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/robot_test_core/__init__.py",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/robot_test_core/adapters.py",
+      "type": "file",
+      "bytes": 1494,
+      "sha256": "92cec9c498b20855ddde0d2a779fa35663b94606603e3d9d8d971256fa89db61"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/robot_test_core/auto_cycle.py",
+      "type": "file",
+      "bytes": 5015,
+      "sha256": "84b2776b6be485434bdba6a2fa38a432ebe7e7c0df296d317070be53f2c073e3"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/robot_test_core/config.py",
+      "type": "file",
+      "bytes": 573,
+      "sha256": "06a68203989504e6b06cb59d90ed5bc62869658cda476c456bd44a5901b8e475"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/robot_test_core/controller.py",
+      "type": "file",
+      "bytes": 10203,
+      "sha256": "c3840fc5fe204d07adaf30d95514d1f54734fea97e95cc415f4d339ccd6d6bfc"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/robot_test_core/logger.py",
+      "type": "file",
+      "bytes": 2078,
+      "sha256": "bef3b86a5ac264ed7d65692ebd692bac42ae5057d991fa42ca49292ef9b3fd2e"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/robot_test_core/models.py",
+      "type": "file",
+      "bytes": 681,
+      "sha256": "29960ec5cc67089b28b15c34883792d72f3c48ef8f1764925c808a82f3666e7b"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/setup.cfg",
+      "type": "file",
+      "bytes": 99,
+      "sha256": "32beb5c6225fdc0672763c68fee78563fff9774a8b10efd6e3adde7842216137"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_core/setup.py",
+      "type": "file",
+      "bytes": 466,
+      "sha256": "033b1a0553a51baed6d3d3867de6a2266f92b502d01f82235e8f3d7c8e767316"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/package.xml",
+      "type": "file",
+      "bytes": 711,
+      "sha256": "6b4dd251c0bbb7522956840d19cb91efe4a5beac2f0b483cd22a60f30f58a58d"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/resource/robot_test_ground",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/robot_test_ground/__init__.py",
+      "type": "file",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/robot_test_ground/app.py",
+      "type": "file",
+      "bytes": 13446,
+      "sha256": "14eace8149acde7e1ae06fa07267b26cf73331c7d1e87cef09114ca23b00ab36"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/robot_test_ground/bridge.py",
+      "type": "file",
+      "bytes": 13737,
+      "sha256": "4216073404fba67bb96c0f5e85c7cc659ef83b3af6fab25cc081f2bc702242bc"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/robot_test_ground/camera_panel.py",
+      "type": "file",
+      "bytes": 3741,
+      "sha256": "751701a71f49c2994a53d27b5566bfe1634c43ce703ebfae6835f4166dd2c772"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/robot_test_ground/frame_stats.py",
+      "type": "file",
+      "bytes": 1181,
+      "sha256": "b7ae2912260be546376441dc4ad4fa4e16e2f82d7bfccd9c0939b2e46615f6ef"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/robot_test_ground/telemetry.py",
+      "type": "file",
+      "bytes": 2505,
+      "sha256": "b50bcc29457ab08813c4c0075af87b08dd32677fc2ef40d7ed053935efb31e72"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/robot_test_ground/test_panel.py",
+      "type": "file",
+      "bytes": 2614,
+      "sha256": "b0ee701b12d6fba0bece4f10d8f3ce301ae63dc0089e6f8ce4c7c39a7165597e"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/setup.cfg",
+      "type": "file",
+      "bytes": 103,
+      "sha256": "911b1004023835d683a07b73acc1d8a7a5777b63067cac8b3e9ed9acd0c8ba5e"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_ground/setup.py",
+      "type": "file",
+      "bytes": 523,
+      "sha256": "d9181408c76f5ef3c93f1831ed93a8f598f25fbfbb65c71851947b200a041e5c"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_msgs/CMakeLists.txt",
+      "type": "file",
+      "bytes": 441,
+      "sha256": "037d3fd5d19cf9e2ab0e0e6ad0ad10d2f3918bf071322acada13a337033b0c60"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_msgs/msg/JogCommand.msg",
+      "type": "file",
+      "bytes": 59,
+      "sha256": "33ba39e799aaa6b4bc26154e56818ca505207c698c6909a83a122fe5299341ed"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_msgs/msg/RobotHeartbeat.msg",
+      "type": "file",
+      "bytes": 110,
+      "sha256": "aa6891ac2dd4c096953763949477a46972596e430ab1bd5ec2815906e804422f"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_msgs/msg/TestEvent.msg",
+      "type": "file",
+      "bytes": 83,
+      "sha256": "852ccce524395548bc23fc4d886e364888fd61fa793f6883a15c5515a6657c54"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_msgs/msg/TorqueCommand.msg",
+      "type": "file",
+      "bytes": 57,
+      "sha256": "038ecaed472edd3151ef022b50d8ae70a6d2864d44a5d8d415a9858403750186"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_msgs/package.xml",
+      "type": "file",
+      "bytes": 476,
+      "sha256": "9f13ecdb14753acd75ac1bc8ad3918264d26e8a44ac9f35033367b12685dfedf"
+    },
+    {
+      "path": "baseline/ros2_ws/src/robot_test_msgs/srv/InjectFault.srv",
+      "type": "file",
+      "bytes": 71,
+      "sha256": "e1d997f7267058c8ce239fe5fca9758f65e65dba8b6d5aea70b438e990632e06"
+    },
+    {
+      "path": "baseline/scripts/build_eyou_canopen_helper.sh",
+      "type": "file",
+      "bytes": 940,
+      "sha256": "972827c106dbfdbf7850d5e291db22faa7f97765ea01ffde7ac252dd64a0460b"
+    },
+    {
+      "path": "baseline/scripts/build_eyou_helper.sh",
+      "type": "file",
+      "bytes": 611,
+      "sha256": "7dc8f0fb347b96bdb294a3aa408b3562319b5613b10a50afbdd1e88a3c380ee4"
+    },
+    {
+      "path": "baseline/scripts/build_livox_helper.sh",
+      "type": "file",
+      "bytes": 478,
+      "sha256": "c9d9cffca025ac807b79381600e645fdb29ddef6b1b78a0503703d235c92e356"
+    },
+    {
+      "path": "baseline/scripts/build_robot_a_helpers.sh",
+      "type": "file",
+      "bytes": 1355,
+      "sha256": "d1bfe37abd652ff763ea34c81289105bf8a2b613ee73e1b4534a17289e3af84d"
+    },
+    {
+      "path": "baseline/scripts/env.sh",
+      "type": "file",
+      "bytes": 630,
+      "sha256": "bf91f38c456f0d7ede881d8b1a81543186c4c23e39fe537c942387838d603bbc"
+    },
+    {
+      "path": "baseline/scripts/finish_control_fix.sh",
+      "type": "file",
+      "bytes": 1097,
+      "sha256": "a264ea76d88ae43d540e86643af44e452cf799830a393f01469fea0d1278a286"
+    },
+    {
+      "path": "baseline/scripts/livox_monitor.cpp",
+      "type": "file",
+      "bytes": 3107,
+      "sha256": "0dff0d11c9aa16436cf96e388710214fe8e0d663f1e51ad8eb8ec8f2b6ff2655"
+    },
+    {
+      "path": "baseline/scripts/probe_rgb_transport.py",
+      "type": "file",
+      "bytes": 2307,
+      "sha256": "634784e6aecb894d9e9bf1d0e572b08cacc75d97d0f58534bc99dbcdbdabd58b"
+    },
+    {
+      "path": "baseline/scripts/realsense_depth.cpp",
+      "type": "file",
+      "bytes": 1603,
+      "sha256": "2313ce0fefd998dcfa40ddec9e877c74dbf1c22cd2cead68d1a642f8ac91e04d"
+    },
+    {
+      "path": "baseline/scripts/remove_legacy_robot_service.sh",
+      "type": "file",
+      "bytes": 1180,
+      "sha256": "84ba532abe7fe6867521de7f8776dd5838353bfc30d26e0bfb90a6ef7959635a"
+    },
+    {
+      "path": "baseline/scripts/rm75_read_state.cpp",
+      "type": "file",
+      "bytes": 949,
+      "sha256": "29b037d41300c6a3edde7e9282901fc62a140d07cc259aaf245b36c82f73db64"
+    },
+    {
+      "path": "baseline/scripts/setup_site_time_sync.sh",
+      "type": "file",
+      "bytes": 2183,
+      "sha256": "705f9f6abe5c20436ea111abe0f03abfc00cbf78944ac69dce85f2beeff68246"
+    },
+    {
+      "path": "baseline/scripts/site_network.sh",
+      "type": "file",
+      "bytes": 458,
+      "sha256": "522947ed64617d40d764bfdacf12bfbcc56b5229a0b6f6bdb3fd1862e3b7654d"
+    },
+    {
+      "path": "baseline/scripts/start_ground.sh",
+      "type": "file",
+      "bytes": 106,
+      "sha256": "ccefa8029217587e265a81e76233beaf40e21879d8ec34f673c47aac6a3c9f13"
+    },
+    {
+      "path": "baseline/scripts/start_ground_dual.sh",
+      "type": "file",
+      "bytes": 232,
+      "sha256": "73eda04649a6549942f75007aed6a2097dd4c1085d78b0830dc8a02166a33520"
+    },
+    {
+      "path": "baseline/scripts/start_ground_site.sh",
+      "type": "file",
+      "bytes": 244,
+      "sha256": "26132d44bfa5cc0ef65dad393c932088d1936ed453fa9e20e5e3e8567c6f3635"
+    },
+    {
+      "path": "baseline/scripts/start_laptop_camera_demo.sh",
+      "type": "file",
+      "bytes": 1120,
+      "sha256": "78297ccf37b074d72120809ecb90c120e4009f7be6872431559ace9097c805b6"
+    },
+    {
+      "path": "baseline/scripts/start_mock_demo.sh",
+      "type": "file",
+      "bytes": 326,
+      "sha256": "87b5514d05b5a69379f8f2f79f298dc8d5a86a7b658b511b61e315fdc09cf811"
+    },
+    {
+      "path": "baseline/scripts/start_robot_a.sh",
+      "type": "file",
+      "bytes": 208,
+      "sha256": "ffd763c7d19ba48dfc8ed86ccd832c8785fc97c3cec1378ae3047785b80e40f4"
+    },
+    {
+      "path": "baseline/scripts/start_robot_a_control.sh",
+      "type": "file",
+      "bytes": 361,
+      "sha256": "bdacf0de37859a96a70a52794ec630340743d020dc170f0f2b4f3f6bee90abb4"
+    },
+    {
+      "path": "baseline/scripts/start_robot_a_site.sh",
+      "type": "file",
+      "bytes": 267,
+      "sha256": "162453330b3a8e2561b00abfb769861fcfb3d6fe78c5ce3115e9c03974d167f6"
+    },
+    {
+      "path": "baseline/scripts/start_robot_b.sh",
+      "type": "file",
+      "bytes": 208,
+      "sha256": "a175ae8936afb3199569b983029b6e43371c77f60e2b52950296e4838358b0a8"
+    },
+    {
+      "path": "baseline/scripts/start_robot_b_control.sh",
+      "type": "file",
+      "bytes": 361,
+      "sha256": "45166f616286a2f91e80db161a81b5b3864bed041baba7b67f8ceeea9a84cdf6"
+    },
+    {
+      "path": "baseline/scripts/start_robot_b_site.sh",
+      "type": "file",
+      "bytes": 267,
+      "sha256": "31cdaefe98a8901f5dc3c73c22f25fa21c46ad5e98ec3e8528bc96e26196a520"
+    },
+    {
+      "path": "baseline/scripts/start_site_all.sh",
+      "type": "file",
+      "bytes": 4116,
+      "sha256": "d9b9eabc125753130061e089985c2a1ea6b997e7e911688c68a210f7eb848131"
+    },
+    {
+      "path": "baseline/tests/acceptance_p0.py",
+      "type": "file",
+      "bytes": 13770,
+      "sha256": "41ff927e72b0b404b6a980eec3c79360f3ab31620d69ef9c290603c30f43aae5"
+    },
+    {
+      "path": "baseline/tests/native_fake/eu_ethercat.h",
+      "type": "file",
+      "bytes": 769,
+      "sha256": "c5668b3fb9df0d26a79217d0d123bb453432a87af3586201f14acd8793c17689"
+    },
+    {
+      "path": "baseline/tests/native_fake/eyou_fake.cpp",
+      "type": "file",
+      "bytes": 1397,
+      "sha256": "bb5a62b2657c271d51e1a51cfba48d67757dc669b4c6a9d0b6dd34f5613606d7"
+    },
+    {
+      "path": "baseline/tests/site_readonly_probe.py",
+      "type": "file",
+      "bytes": 3903,
+      "sha256": "c5c40eb9ea37c2b0f8cddd8f14b1c26cd293844fc6f45853e6303714b8fe7a3d"
+    },
+    {
+      "path": "baseline/tests/test_auto_cycle_all_axes.py",
+      "type": "file",
+      "bytes": 4251,
+      "sha256": "e52f2661dd56838efc1c9b8c320f48e6c6e3180b1d523b3dd3387dd5d2d28645"
+    },
+    {
+      "path": "baseline/tests/test_cameras.py",
+      "type": "file",
+      "bytes": 1221,
+      "sha256": "73aaf7169bff71aa1e277876276d80e96a3ed464e7554999557ef30653bc9d74"
+    },
+    {
+      "path": "baseline/tests/test_control_time_and_torque.py",
+      "type": "file",
+      "bytes": 3807,
+      "sha256": "477f849418c8d3339faa6f26628759ce635bf7c0b26585923543d83a33bb9ae8"
+    },
+    {
+      "path": "baseline/tests/test_eyou_native.py",
+      "type": "file",
+      "bytes": 3360,
+      "sha256": "ca47489216c91defa507d18b1ee7e7ee32cf2861dfb0f2a0737254a157d00c7d"
+    },
+    {
+      "path": "baseline/tests/test_frame_stats.py",
+      "type": "file",
+      "bytes": 817,
+      "sha256": "376d8da9ce3f5aa6c307b16cee7f55b3d227064bfec1eb87581cc4475796ef09"
+    },
+    {
+      "path": "baseline/tests/test_lidar.py",
+      "type": "file",
+      "bytes": 834,
+      "sha256": "daffc60f0397d0558ea01303363cf90563c75f29850c5eb07eaa41bdb16e6648"
+    },
+    {
+      "path": "baseline/tests/test_monitor_stop.py",
+      "type": "file",
+      "bytes": 3716,
+      "sha256": "bd2c5b080fd7352b1e5771996283cd576a0b45bf057567a28101a51d8c060eac"
+    },
+    {
+      "path": "baseline/tests/test_real_telemetry.py",
+      "type": "file",
+      "bytes": 5294,
+      "sha256": "ccadda24a72c23fa16ee49520f724b0f6b17aea5eb1564d55c86138f59c0ff76"
+    },
+    {
+      "path": "baseline/tests/test_rgb_devices.py",
+      "type": "file",
+      "bytes": 2616,
+      "sha256": "33baceabf49de4e3c87176187c679b0402e24aae78d05ea89f4e1a35a3832ba1"
+    },
+    {
+      "path": "baseline/tests/test_safety.py",
+      "type": "file",
+      "bytes": 3747,
+      "sha256": "0a05e0a17d4bbde5e76725e75cd95b5f447eaed8c0e796ed4be7b1705d679ae9"
+    },
+    {
+      "path": "baseline/tests/test_uvc_camera.py",
+      "type": "file",
+      "bytes": 2275,
+      "sha256": "93e3acb957932d1b091c663f8ddfafe5237a7c9da75f677faa9def6a4fa41c52"
+    },
+    {
+      "path": "docs/01_hardware.md",
+      "type": "file",
+      "bytes": 4625,
+      "sha256": "947cc882df4735b36ddbffe36784e4c2e6f3ad030a9754876c3ef5a39e033d9f"
+    },
+    {
+      "path": "docs/02_drivers.md",
+      "type": "file",
+      "bytes": 6819,
+      "sha256": "60ec129a12e52a56f999b3e1883e5505daea76fc230fab209e2efe570fb1ed82"
+    },
+    {
+      "path": "docs/03_control_api.md",
+      "type": "file",
+      "bytes": 5789,
+      "sha256": "6f8bcf2676edaec32f2f48b3a4fc560d16886b56e5012b8911e9901dc16a8007"
+    },
+    {
+      "path": "docs/04_deployment.md",
+      "type": "file",
+      "bytes": 5626,
+      "sha256": "8711edb1241098c24c31fcf57e84600f39ea8b7f0686be43cae885e941a57acc"
+    },
+    {
+      "path": "docs/05_console_plan.md",
+      "type": "file",
+      "bytes": 5499,
+      "sha256": "87dca1bacf6732fcc9fd2dea8d7be30b1ee56aed231e64ea449a0fbc54f8c871"
+    },
+    {
+      "path": "docs/06_validation.md",
+      "type": "file",
+      "bytes": 2776,
+      "sha256": "8108c0ed11cc841efe58d5f4de9870a34f8fd8d994e185aa087ddb97170bebd1"
+    },
+    {
+      "path": "hardware_inventory.json",
+      "type": "file",
+      "bytes": 11057,
+      "sha256": "250acd7f2b823ce4f36b9445b0313acb1394d2f1d46d2b8fee838d0687cf0a91"
+    },
+    {
+      "path": "provenance.json",
+      "type": "file",
+      "bytes": 773,
+      "sha256": "bc05a2de48ac7431ecb5284429db05d001337c80a519d2f644b2112ebac10f43"
+    },
+    {
+      "path": "tools/verify_bundle.py",
+      "type": "file",
+      "bytes": 1582,
+      "sha256": "7d7c760507c3f6b8586feccafb5071142097c8ab979bd907dda4f26d2869f7e5"
+    }
+  ]
+}

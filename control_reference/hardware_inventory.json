@@ -1,0 +1,388 @@
+{
+  "robot_a": {
+    "source": "baseline/config/robot_a_control/robot_a.yaml",
+    "verification": "local_snapshot_only",
+    "axes": {
+      "drive": {
+        "max_velocity": 6.283185307179586,
+        "jog_velocity": 0.05,
+        "bus": "ethercat",
+        "slave_position": 2,
+        "encoder_counts_per_rev": 65536,
+        "gear_ratio": 51,
+        "position_unit": "rad",
+        "velocity_unit": "rad/s"
+      },
+      "clamp_left": {
+        "max_velocity": 0.2,
+        "jog_velocity": 0.1,
+        "bus": "ethercat",
+        "slave_position": 0,
+        "control_mode": "torque",
+        "torque_raw_min": -400,
+        "torque_raw_max": 400,
+        "jog_torque": 400,
+        "torque_sign": -1
+      },
+      "clamp_right": {
+        "max_velocity": 0.2,
+        "jog_velocity": 0.1,
+        "bus": "ethercat",
+        "slave_position": 1,
+        "control_mode": "torque",
+        "torque_raw_min": -400,
+        "torque_raw_max": 400,
+        "jog_torque": 400,
+        "torque_sign": 1
+      },
+      "z_axis": {
+        "max_velocity": 0.01,
+        "jog_velocity": 5e-05,
+        "bus": "ethercat",
+        "slave_position": 3,
+        "encoder_counts_per_rev": 65536,
+        "gear_ratio": 101,
+        "lead_m": 0.02,
+        "position_unit": "m",
+        "velocity_unit": "m/s",
+        "requires_zero": false,
+        "position_min": -0.02,
+        "position_max": 0.5
+      }
+    },
+    "hardware": {
+      "ethercat": {
+        "enabled": true,
+        "backend": "eyou",
+        "executable": "/home/phi/robot_test_system/.local-deps/bin/eyou_agent.zero-fix",
+        "interface": "enp2s0",
+        "z_zero_counts": -1582005,
+        "allow_unreferenced_z": false,
+        "read_only": false,
+        "log_file": "/home/phi/robot_test_system/logs/eyou_sdk.log",
+        "stop_policy": "zero_and_disable",
+        "z_homing": {
+          "direction": -1,
+          "approach_velocity": 0.001,
+          "backoff_velocity": 0.001,
+          "backoff_sec": 0.5,
+          "repetitions": 3,
+          "baseline_samples": 20,
+          "torque_delta_raw": 500,
+          "torque_ratio": 2.0,
+          "approach_timeout_sec": 600.0
+        }
+      },
+      "rm75": {
+        "enabled": true,
+        "backend": "rm75_monitor",
+        "host": "192.168.10.18",
+        "port": 8080,
+        "executable": "/home/phi/robot_test_system/.local-deps/bin/rm75_read_state",
+        "timeout_sec": 3,
+        "poll_sec": 2
+      },
+      "rs485": {
+        "enabled": false,
+        "backend": "unavailable",
+        "reason": "Device model, connection and register map pending"
+      },
+      "lidar": {
+        "enabled": true,
+        "backend": "livox",
+        "host": "192.168.10.23",
+        "executable": "/home/phi/robot_test_system/.local-deps/bin/livox_monitor",
+        "sdk_config": "/home/phi/robot_test_system/config/robot_a_site/mid360s.json",
+        "poll_sec": 0.01,
+        "stale_sec": 5
+      }
+    },
+    "cameras": {
+      "camera_1": {
+        "enabled": true,
+        "backend": "uvc",
+        "rgb_selector": {
+          "name_regex": "USB Camera",
+          "preferred_path": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:5:1.0-video-index0"
+        },
+        "width": 640,
+        "height": 480,
+        "fps": 5,
+        "transport": "compressed",
+        "label": "USB RGB 1"
+      },
+      "camera_2": {
+        "enabled": true,
+        "backend": "uvc",
+        "rgb_selector": {
+          "name_regex": "Intel.*RealSense",
+          "preferred_path": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:2:1.3-video-index0"
+        },
+        "width": 640,
+        "height": 480,
+        "fps": 5,
+        "transport": "compressed",
+        "label": "RealSense RGB"
+      },
+      "camera_3": {
+        "enabled": true,
+        "backend": "uvc",
+        "rgb_selector": {
+          "name_regex": "USB Camera",
+          "preferred_path": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:6:1.0-video-index0"
+        },
+        "width": 640,
+        "height": 480,
+        "fps": 5,
+        "transport": "compressed",
+        "label": "USB RGB 2"
+      },
+      "camera_4": {
+        "enabled": true,
+        "backend": "uvc",
+        "rgb_selector": {
+          "name_regex": "Intel.*RealSense",
+          "preferred_path": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:4:1.3-video-index0"
+        },
+        "width": 640,
+        "height": 480,
+        "fps": 5,
+        "transport": "compressed",
+        "label": "RealSense RGB 2"
+      }
+    },
+    "test_profile_only": {
+      "watchdog_timeout_ms": 2000,
+      "heartbeat_hz": 1.0,
+      "diagnostics_hz": 5.0,
+      "auto_cycle": {
+        "enabled": true,
+        "axis": "drive",
+        "positive_target": 1.0,
+        "negative_target": -1.0,
+        "velocity": 0.1,
+        "dwell_sec": 1.0,
+        "axes": {
+          "drive": {
+            "enabled": false,
+            "velocity": 0.17453292519943295,
+            "reverse_period_sec": 5.0
+          },
+          "clamp_left": {
+            "torque_raw": 400,
+            "period_sec": 10.0
+          },
+          "clamp_right": {
+            "torque_raw": 400,
+            "period_sec": 10.0
+          },
+          "z_axis": {
+            "enabled": false,
+            "position_min_m": 0.0,
+            "position_max_m": 0.02,
+            "velocity": 0.01
+          }
+        }
+      }
+    }
+  },
+  "robot_b": {
+    "source": "baseline/config/robot_b_control/robot_b.yaml",
+    "verification": "local_snapshot_only",
+    "axes": {
+      "drive": {
+        "max_velocity": 6.283185307179586,
+        "jog_velocity": 0.05,
+        "bus": "ethercat",
+        "slave_position": 2,
+        "encoder_counts_per_rev": 65536,
+        "gear_ratio": 51,
+        "position_unit": "rad",
+        "velocity_unit": "rad/s"
+      },
+      "clamp_left": {
+        "max_velocity": 0.2,
+        "jog_velocity": 0.1,
+        "bus": "ethercat",
+        "slave_position": 0,
+        "control_mode": "torque",
+        "torque_raw_min": -400,
+        "torque_raw_max": 400,
+        "jog_torque": 400,
+        "torque_sign": -1
+      },
+      "clamp_right": {
+        "max_velocity": 0.2,
+        "jog_velocity": 0.1,
+        "bus": "ethercat",
+        "slave_position": 1,
+        "control_mode": "torque",
+        "torque_raw_min": -400,
+        "torque_raw_max": 400,
+        "jog_torque": 400,
+        "torque_sign": 1
+      },
+      "z_axis": {
+        "max_velocity": 0.01,
+        "jog_velocity": 5e-05,
+        "bus": "ethercat",
+        "slave_position": 3,
+        "encoder_counts_per_rev": 65536,
+        "gear_ratio": 101,
+        "lead_m": 0.02,
+        "position_unit": "m",
+        "velocity_unit": "m/s",
+        "requires_zero": false,
+        "position_min": -0.02,
+        "position_max": 0.5
+      },
+      "support_left": {
+        "bus": "canopen",
+        "node_id": 1,
+        "control_mode": "torque",
+        "torque_raw_min": -800,
+        "torque_raw_max": 800,
+        "jog_torque": 800,
+        "torque_sign": 1
+      },
+      "support_right": {
+        "bus": "canopen",
+        "node_id": 2,
+        "control_mode": "torque",
+        "torque_raw_min": -800,
+        "torque_raw_max": 800,
+        "jog_torque": 800,
+        "torque_sign": 1
+      }
+    },
+    "hardware": {
+      "ethercat": {
+        "enabled": true,
+        "backend": "eyou",
+        "executable": "/home/phi/robot_test_system_git/.local-deps/bin/eyou_agent.zero-fix",
+        "interface": "enp2s0",
+        "z_zero_counts": -13988040,
+        "allow_unreferenced_z": false,
+        "read_only": false,
+        "log_file": "/home/phi/robot_test_system/logs/eyou_sdk.log",
+        "stop_policy": "zero_and_disable",
+        "z_homing": {
+          "direction": -1,
+          "approach_velocity": 0.001,
+          "backoff_velocity": 0.001,
+          "backoff_sec": 0.5,
+          "repetitions": 3,
+          "baseline_samples": 20,
+          "torque_delta_raw": 500,
+          "torque_ratio": 2.0,
+          "approach_timeout_sec": 600.0
+        }
+      },
+      "lidar": {
+        "enabled": true,
+        "backend": "livox",
+        "host": "192.168.10.73",
+        "executable": "/home/phi/robot_test_system/.local-deps/bin/livox_monitor",
+        "sdk_config": "/home/phi/robot_test_system/config/robot_b_site/mid360s.json",
+        "poll_sec": 0.01,
+        "stale_sec": 5,
+        "model": "MID360s"
+      },
+      "canopen": {
+        "enabled": true,
+        "backend": "eyou_canopen",
+        "interface": "can0",
+        "device_index": 0,
+        "bitrate": 1000000,
+        "executable": "/home/phi/robot_test_system_git/.local-deps/bin/eyou_canopen_agent",
+        "sdk_lib": "/home/phi/robot_test_system_git/.local-deps/eyou_canopen_sdk/lib",
+        "max_abs_torque": 800,
+        "torque_slope": 500,
+        "watchdog_ms": 2000,
+        "log_file": "/home/phi/robot_test_system_git/logs/eyou_canopen_agent.log"
+      }
+    },
+    "cameras": {
+      "camera_1": {
+        "enabled": true,
+        "backend": "uvc",
+        "rgb_selector": {
+          "name_regex": "^USB Camera:",
+          "preferred_path": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:3:1.0-video-index0"
+        },
+        "width": 640,
+        "height": 480,
+        "fps": 5,
+        "transport": "compressed",
+        "label": "USB RGB 1"
+      },
+      "camera_2": {
+        "enabled": true,
+        "backend": "uvc",
+        "rgb_selector": {
+          "name_regex": "Intel.*RealSense",
+          "preferred_path": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:2:1.3-video-index0"
+        },
+        "width": 640,
+        "height": 480,
+        "fps": 5,
+        "transport": "compressed",
+        "label": "RealSense RGB"
+      },
+      "camera_3": {
+        "enabled": true,
+        "backend": "uvc",
+        "rgb_selector": {
+          "name_regex": "S-YUE.*USB Camera",
+          "preferred_path": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:1:1.0-video-index0"
+        },
+        "width": 640,
+        "height": 480,
+        "fps": 5,
+        "transport": "compressed",
+        "label": "S-YUE RGB"
+      }
+    },
+    "test_profile_only": {
+      "watchdog_timeout_ms": 2000,
+      "heartbeat_hz": 1.0,
+      "diagnostics_hz": 5.0,
+      "auto_cycle": {
+        "enabled": true,
+        "axis": "drive",
+        "positive_target": 1.0,
+        "negative_target": -1.0,
+        "velocity": 0.1,
+        "dwell_sec": 1.0,
+        "axes": {
+          "drive": {
+            "enabled": false,
+            "velocity": 0.17453292519943295,
+            "reverse_period_sec": 5.0
+          },
+          "clamp_left": {
+            "torque_raw": 400,
+            "period_sec": 10.0
+          },
+          "clamp_right": {
+            "torque_raw": 400,
+            "period_sec": 10.0
+          },
+          "z_axis": {
+            "position_min_m": 0.0,
+            "position_max_m": 0.02,
+            "velocity": 0.01
+          },
+          "support_left": {
+            "torque_raw": 800,
+            "period_sec": 10.0
+          },
+          "support_right": {
+            "torque_raw": 800,
+            "period_sec": 10.0
+          }
+        }
+      }
+    }
+  }
+}

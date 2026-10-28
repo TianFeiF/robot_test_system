@@ -1,0 +1,10 @@
+.venv/
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+logs/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+.local-deps/
